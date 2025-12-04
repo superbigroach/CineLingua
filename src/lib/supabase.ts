@@ -1,9 +1,20 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Create a dummy client for build time when env vars aren't available
+// This prevents the build from failing during static generation
+function createSupabaseClient(): SupabaseClient {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    // Return a mock client during build that won't actually be used
+    console.warn('Supabase environment variables not configured - using mock client');
+    return createClient('https://placeholder.supabase.co', 'placeholder-key');
+  }
+  return createClient(supabaseUrl, supabaseAnonKey);
+}
+
+export const supabase = createSupabaseClient();
 
 // Types for our database
 export interface DbUser {
