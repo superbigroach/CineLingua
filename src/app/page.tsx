@@ -200,7 +200,107 @@ export default function Home() {
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-6 pb-20">
+      <div className="max-w-7xl mx-auto px-6 pb-20 lg:pr-[340px] relative">
+        {/* AI Language Tutor - Fixed on right for large screens */}
+        <div className="hidden lg:block fixed right-6 top-24 w-[300px] z-40">
+          <div className="bg-[rgba(5,5,8,0.95)] backdrop-blur-xl rounded-2xl p-5 border border-white/10 shadow-xl">
+            <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center">
+                <i className="fas fa-robot text-white text-sm"></i>
+              </div>
+              <span>AI Language Tutor</span>
+              <span className="text-[10px] px-2 py-0.5 rounded bg-green-500/20 text-green-400 border border-green-500/30 ml-auto">
+                Gemini
+              </span>
+            </h2>
+
+            {!selectedMovie ? (
+              <div className="text-center py-8 text-white/40">
+                <i className="fas fa-hand-point-left text-3xl mb-3"></i>
+                <p className="text-sm">Select a movie to start learning!</p>
+              </div>
+            ) : loadingContent ? (
+              <div className="text-center py-8">
+                <div className="w-8 h-8 border-2 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin mx-auto mb-3"></div>
+                <p className="text-white/40 text-sm">Generating content...</p>
+              </div>
+            ) : learningContent ? (
+              <div className="space-y-4 max-h-[calc(100vh-180px)] overflow-y-auto pr-2 custom-scrollbar">
+                {/* Selected Movie */}
+                <div className="flex gap-3 p-3 bg-black/30 rounded-xl">
+                  <img
+                    src={getImageUrl(selectedMovie.poster_path, 'w92')}
+                    alt={selectedMovie.title}
+                    className="w-12 h-16 rounded object-cover"
+                  />
+                  <div>
+                    <h3 className="text-white font-medium text-sm">{selectedMovie.title}</h3>
+                    <p className="text-white/40 text-xs">{selectedMovie.original_title}</p>
+                  </div>
+                </div>
+
+                {/* Vocabulary */}
+                {learningContent.vocabulary?.length > 0 && (
+                  <div>
+                    <h3 className="text-purple-400 font-medium mb-2 text-sm flex items-center gap-2">
+                      <i className="fas fa-book"></i>
+                      Vocabulary
+                    </h3>
+                    <div className="space-y-2">
+                      {learningContent.vocabulary.slice(0, 5).map((item: any, i: number) => (
+                        <div key={i} className="p-2 bg-black/30 rounded-lg">
+                          <div className="flex justify-between items-start mb-1">
+                            <span className="text-white font-medium text-sm">{item.word}</span>
+                            <span className={`text-[10px] px-1.5 py-0.5 rounded ${
+                              item.difficulty === 'beginner' ? 'bg-green-500/20 text-green-400' :
+                              item.difficulty === 'intermediate' ? 'bg-amber-500/20 text-amber-400' :
+                              'bg-red-500/20 text-red-400'
+                            }`}>
+                              {item.difficulty}
+                            </span>
+                          </div>
+                          <p className="text-white/50 text-xs">{item.translation}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Phrases */}
+                {learningContent.phrases?.length > 0 && (
+                  <div>
+                    <h3 className="text-purple-400 font-medium mb-2 text-sm flex items-center gap-2">
+                      <i className="fas fa-comment"></i>
+                      Useful Phrases
+                    </h3>
+                    <div className="space-y-2">
+                      {learningContent.phrases.slice(0, 3).map((item: any, i: number) => (
+                        <div key={i} className="p-2 bg-black/30 rounded-lg">
+                          <p className="text-white italic text-xs">&ldquo;{item.phrase}&rdquo;</p>
+                          <p className="text-white/50 text-[11px] mt-1">{item.meaning}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Cultural Context */}
+                {learningContent.culturalContext && (
+                  <div>
+                    <h3 className="text-purple-400 font-medium mb-2 text-sm flex items-center gap-2">
+                      <i className="fas fa-theater-masks"></i>
+                      Cultural Context
+                    </h3>
+                    <p className="text-white/60 text-xs p-2 bg-black/30 rounded-lg leading-relaxed">
+                      {learningContent.culturalContext}
+                    </p>
+                  </div>
+                )}
+              </div>
+            ) : null}
+          </div>
+        </div>
+
         {/* Region Selector Section */}
         <section id="regions" className="mb-12">
           <h2 className="text-xl font-bold mb-6 flex items-center gap-3">
@@ -208,7 +308,7 @@ export default function Home() {
             <span>Explore Francophone Regions</span>
           </h2>
 
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-9 gap-3">
+          <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-9 gap-3">
             <button
               onClick={() => setSelectedRegion('')}
               className={`p-3 rounded-xl text-center transition-all hover:scale-105 border ${
@@ -283,168 +383,143 @@ export default function Home() {
           </section>
         )}
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Movie Grid */}
-          <div className="lg:col-span-2" id="movies">
-            <h2 className="text-xl font-bold mb-6 flex items-center gap-3">
-              <span className="text-purple-400 text-sm">02.</span>
-              <span>
-                Popular Movies
-                {selectedRegion && (
-                  <span className="text-cyan-400 ml-2 text-base font-normal">
-                    in {FRANCOPHONE_REGIONS.find(r => r.code === selectedRegion)?.name}
-                  </span>
-                )}
+        {/* Movie Grid */}
+        <section id="movies" className="mb-12">
+          <h2 className="text-xl font-bold mb-6 flex items-center gap-3">
+            <span className="text-purple-400 text-sm">02.</span>
+            <span>
+              Popular Movies
+              {selectedRegion && (
+                <span className="text-cyan-400 ml-2 text-base font-normal">
+                  in {FRANCOPHONE_REGIONS.find(r => r.code === selectedRegion)?.name}
+                </span>
+              )}
+            </span>
+          </h2>
+
+          {loading ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {[...Array(10)].map((_, i) => (
+                <div key={i} className="bg-white/5 rounded-xl h-72 animate-pulse" />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {movies.slice(0, 15).map((movie) => (
+                <div
+                  key={movie.id}
+                  onClick={() => loadLearningContent(movie)}
+                  className={`bg-white/5 rounded-xl overflow-hidden cursor-pointer transition-all hover:scale-[1.02] hover:bg-white/10 border ${
+                    selectedMovie?.id === movie.id
+                      ? 'border-cyan-500/50 ring-2 ring-cyan-500/30'
+                      : 'border-white/10 hover:border-white/20'
+                  }`}
+                >
+                  <div className="aspect-[2/3] overflow-hidden">
+                    <img
+                      src={getImageUrl(movie.poster_path, 'w342')}
+                      alt={movie.title}
+                      className="w-full h-full object-cover transition-transform hover:scale-105"
+                    />
+                  </div>
+                  <div className="p-3">
+                    <h3 className="text-white font-medium text-sm truncate">
+                      {movie.title}
+                    </h3>
+                    <p className="text-white/40 text-xs truncate">
+                      {movie.original_title !== movie.title && movie.original_title}
+                    </p>
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="text-amber-400 text-xs">
+                        <i className="fas fa-star mr-1"></i>
+                        {movie.vote_average.toFixed(1)}
+                      </span>
+                      <span className="text-white/30 text-xs">
+                        {movie.release_date?.split('-')[0]}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* Mobile AI Tutor - Only shown on small screens */}
+        <div className="lg:hidden mb-12">
+          <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 border border-white/10">
+            <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center">
+                <i className="fas fa-robot text-white text-sm"></i>
+              </div>
+              <span>AI Language Tutor</span>
+              <span className="text-[10px] px-2 py-0.5 rounded bg-green-500/20 text-green-400 border border-green-500/30 ml-auto">
+                Gemini
               </span>
             </h2>
 
-            {loading ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="bg-white/5 rounded-xl h-72 animate-pulse" />
-                ))}
+            {!selectedMovie ? (
+              <div className="text-center py-8 text-white/40">
+                <i className="fas fa-hand-pointer text-3xl mb-3"></i>
+                <p className="text-sm">Select a movie above to start learning!</p>
               </div>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {movies.slice(0, 12).map((movie) => (
-                  <div
-                    key={movie.id}
-                    onClick={() => loadLearningContent(movie)}
-                    className={`bg-white/5 rounded-xl overflow-hidden cursor-pointer transition-all hover:scale-[1.02] hover:bg-white/10 border ${
-                      selectedMovie?.id === movie.id
-                        ? 'border-cyan-500/50 ring-2 ring-cyan-500/30'
-                        : 'border-white/10 hover:border-white/20'
-                    }`}
-                  >
-                    <div className="aspect-[2/3] overflow-hidden">
-                      <img
-                        src={getImageUrl(movie.poster_path, 'w342')}
-                        alt={movie.title}
-                        className="w-full h-full object-cover transition-transform hover:scale-105"
-                      />
-                    </div>
-                    <div className="p-3">
-                      <h3 className="text-white font-medium text-sm truncate">
-                        {movie.title}
-                      </h3>
-                      <p className="text-white/40 text-xs truncate">
-                        {movie.original_title !== movie.title && movie.original_title}
-                      </p>
-                      <div className="flex items-center justify-between mt-2">
-                        <span className="text-amber-400 text-xs">
-                          <i className="fas fa-star mr-1"></i>
-                          {movie.vote_average.toFixed(1)}
-                        </span>
-                        <span className="text-white/30 text-xs">
-                          {movie.release_date?.split('-')[0]}
-                        </span>
-                      </div>
+            ) : loadingContent ? (
+              <div className="text-center py-8">
+                <div className="w-8 h-8 border-2 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin mx-auto mb-3"></div>
+                <p className="text-white/40 text-sm">Generating content...</p>
+              </div>
+            ) : learningContent ? (
+              <div className="space-y-4">
+                {/* Selected Movie */}
+                <div className="flex gap-3 p-3 bg-black/30 rounded-xl">
+                  <img
+                    src={getImageUrl(selectedMovie.poster_path, 'w92')}
+                    alt={selectedMovie.title}
+                    className="w-12 h-16 rounded object-cover"
+                  />
+                  <div>
+                    <h3 className="text-white font-medium text-sm">{selectedMovie.title}</h3>
+                    <p className="text-white/40 text-xs">{selectedMovie.original_title}</p>
+                  </div>
+                </div>
+
+                {/* Vocabulary */}
+                {learningContent.vocabulary?.length > 0 && (
+                  <div>
+                    <h3 className="text-purple-400 font-medium mb-2 text-sm flex items-center gap-2">
+                      <i className="fas fa-book"></i>
+                      Vocabulary
+                    </h3>
+                    <div className="grid grid-cols-2 gap-2">
+                      {learningContent.vocabulary.slice(0, 4).map((item: any, i: number) => (
+                        <div key={i} className="p-2 bg-black/30 rounded-lg">
+                          <span className="text-white font-medium text-sm block">{item.word}</span>
+                          <p className="text-white/50 text-xs">{item.translation}</p>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
+                )}
 
-          {/* Learning Panel */}
-          <div className="lg:col-span-1">
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 border border-white/10 lg:sticky lg:top-24">
-              <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center">
-                  <i className="fas fa-robot text-white text-sm"></i>
-                </div>
-                <span>AI Language Tutor</span>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-green-500/20 text-green-400 border border-green-500/30 ml-auto">
-                  Gemini
-                </span>
-              </h2>
-
-              {!selectedMovie ? (
-                <div className="text-center py-12 text-white/40">
-                  <i className="fas fa-hand-point-left text-4xl mb-3"></i>
-                  <p>Select a movie to start learning!</p>
-                </div>
-              ) : loadingContent ? (
-                <div className="text-center py-12">
-                  <div className="w-10 h-10 border-3 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin mx-auto mb-3"></div>
-                  <p className="text-white/40 text-sm">Generating content...</p>
-                </div>
-              ) : learningContent ? (
-                <div className="space-y-5 max-h-[60vh] overflow-y-auto pr-2">
-                  {/* Selected Movie */}
-                  <div className="flex gap-3 p-3 bg-black/30 rounded-xl">
-                    <img
-                      src={getImageUrl(selectedMovie.poster_path, 'w92')}
-                      alt={selectedMovie.title}
-                      className="w-12 h-16 rounded object-cover"
-                    />
-                    <div>
-                      <h3 className="text-white font-medium text-sm">{selectedMovie.title}</h3>
-                      <p className="text-white/40 text-xs">{selectedMovie.original_title}</p>
+                {/* Phrases */}
+                {learningContent.phrases?.length > 0 && (
+                  <div>
+                    <h3 className="text-purple-400 font-medium mb-2 text-sm flex items-center gap-2">
+                      <i className="fas fa-comment"></i>
+                      Useful Phrases
+                    </h3>
+                    <div className="space-y-2">
+                      {learningContent.phrases.slice(0, 2).map((item: any, i: number) => (
+                        <div key={i} className="p-2 bg-black/30 rounded-lg">
+                          <p className="text-white italic text-xs">&ldquo;{item.phrase}&rdquo;</p>
+                          <p className="text-white/50 text-[11px] mt-1">{item.meaning}</p>
+                        </div>
+                      ))}
                     </div>
                   </div>
-
-                  {/* Vocabulary */}
-                  {learningContent.vocabulary?.length > 0 && (
-                    <div>
-                      <h3 className="text-purple-400 font-medium mb-2 text-sm flex items-center gap-2">
-                        <i className="fas fa-book"></i>
-                        Vocabulary
-                      </h3>
-                      <div className="space-y-2">
-                        {learningContent.vocabulary.slice(0, 5).map((item: any, i: number) => (
-                          <div key={i} className="p-3 bg-black/30 rounded-lg">
-                            <div className="flex justify-between items-start mb-1">
-                              <span className="text-white font-medium text-sm">{item.word}</span>
-                              <span className={`text-[10px] px-1.5 py-0.5 rounded ${
-                                item.difficulty === 'beginner' ? 'bg-green-500/20 text-green-400' :
-                                item.difficulty === 'intermediate' ? 'bg-amber-500/20 text-amber-400' :
-                                'bg-red-500/20 text-red-400'
-                              }`}>
-                                {item.difficulty}
-                              </span>
-                            </div>
-                            <p className="text-white/50 text-xs">{item.translation}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Phrases */}
-                  {learningContent.phrases?.length > 0 && (
-                    <div>
-                      <h3 className="text-purple-400 font-medium mb-2 text-sm flex items-center gap-2">
-                        <i className="fas fa-comment"></i>
-                        Useful Phrases
-                      </h3>
-                      <div className="space-y-2">
-                        {learningContent.phrases.slice(0, 3).map((item: any, i: number) => (
-                          <div key={i} className="p-3 bg-black/30 rounded-lg">
-                            <p className="text-white italic text-sm">&ldquo;{item.phrase}&rdquo;</p>
-                            <p className="text-white/50 text-xs mt-1">{item.meaning}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Cultural Context */}
-                  {learningContent.culturalContext && (
-                    <div>
-                      <h3 className="text-purple-400 font-medium mb-2 text-sm flex items-center gap-2">
-                        <i className="fas fa-theater-masks"></i>
-                        Cultural Context
-                      </h3>
-                      <p className="text-white/60 text-xs p-3 bg-black/30 rounded-lg leading-relaxed">
-                        {learningContent.culturalContext}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              ) : null}
-            </div>
+                )}
+              </div>
+            ) : null}
           </div>
         </div>
 
