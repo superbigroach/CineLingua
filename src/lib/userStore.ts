@@ -263,7 +263,9 @@ export async function recordMovieWatched(userId: string, movieId: string): Promi
 
   // Update in Supabase
   if (!userId.startsWith('local_')) {
-    supabase.rpc('increment_movies', { user_id: userId }).catch(console.error);
+    supabase.rpc('increment_movies', { user_id: userId }).then(({ error }) => {
+      if (error) console.error(error);
+    });
   }
 }
 
