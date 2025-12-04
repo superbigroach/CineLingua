@@ -12,11 +12,29 @@ interface QuizQuestion {
 interface QuizModalProps {
   questions: QuizQuestion[];
   movieTitle: string;
+  language?: string;
+  languageCode?: string;
   onComplete: (correct: number, total: number) => void;
   onClose: () => void;
 }
 
-export default function QuizModal({ questions, movieTitle, onComplete, onClose }: QuizModalProps) {
+// Celebration phrases in different languages
+const celebrations: Record<string, { perfect: string; good: string; okay: string }> = {
+  fr: { perfect: 'Parfait!', good: 'Très bien!', okay: 'Bien joué!' },
+  es: { perfect: 'Perfecto!', good: 'Muy bien!', okay: 'Bien hecho!' },
+  de: { perfect: 'Perfekt!', good: 'Sehr gut!', okay: 'Gut gemacht!' },
+  it: { perfect: 'Perfetto!', good: 'Molto bene!', okay: 'Ben fatto!' },
+  pt: { perfect: 'Perfeito!', good: 'Muito bem!', okay: 'Bem feito!' },
+  ja: { perfect: '完璧!', good: 'とても良い!', okay: 'よくできました!' },
+  ko: { perfect: '완벽해요!', good: '아주 좋아요!', okay: '잘했어요!' },
+  zh: { perfect: '完美!', good: '非常好!', okay: '做得好!' },
+  hi: { perfect: 'परफेक्ट!', good: 'बहुत अच्छा!', okay: 'अच्छा किया!' },
+  ar: { perfect: 'ممتاز!', good: 'جيد جداً!', okay: 'أحسنت!' },
+  ru: { perfect: 'Отлично!', good: 'Очень хорошо!', okay: 'Хорошо!' },
+  tr: { perfect: 'Mükemmel!', good: 'Çok iyi!', okay: 'Aferin!' },
+};
+
+export default function QuizModal({ questions, movieTitle, language = 'French', languageCode = 'fr', onComplete, onClose }: QuizModalProps) {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
@@ -103,7 +121,11 @@ export default function QuizModal({ questions, movieTitle, onComplete, onClose }
               </div>
 
               <h3 className="text-2xl font-bold mb-2">
-                {isPerfect ? 'Parfait!' : percentage >= 70 ? 'Très bien!' : 'Bien joué!'}
+                {isPerfect
+                  ? (celebrations[languageCode]?.perfect || 'Perfect!')
+                  : percentage >= 70
+                    ? (celebrations[languageCode]?.good || 'Great job!')
+                    : (celebrations[languageCode]?.okay || 'Good effort!')}
               </h3>
               <p className="text-white/60 mb-6">
                 You got {score} out of {questions.length} correct

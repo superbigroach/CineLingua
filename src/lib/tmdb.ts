@@ -1,5 +1,5 @@
 // TMDB API - FREE (https://www.themoviedb.org/settings/api)
-// TV5 content integration through French language movies
+// Multi-language movie discovery for language learning
 
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 const TMDB_API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
@@ -25,17 +25,174 @@ export interface TMDBResponse {
   total_results: number;
 }
 
-// Get popular French movies (TV5 Monde content area)
-export async function getFrenchMovies(page = 1): Promise<TMDBResponse> {
+// Supported languages for learning (Gemini works great with all these)
+export interface LearningLanguage {
+  code: string;          // ISO 639-1 code for TMDB
+  name: string;          // Display name
+  nativeName: string;    // Name in the language itself
+  flag: string;          // Emoji flag
+  speechCode: string;    // Web Speech API code
+  regions: { code: string; name: string; flag: string }[];
+}
+
+export const LEARNING_LANGUAGES: LearningLanguage[] = [
+  {
+    code: 'fr',
+    name: 'French',
+    nativeName: 'Français',
+    flag: '🇫🇷',
+    speechCode: 'fr-FR',
+    regions: [
+      { code: 'FR', name: 'France', flag: '🇫🇷' },
+      { code: 'BE', name: 'Belgium', flag: '🇧🇪' },
+      { code: 'CA', name: 'Canada', flag: '🇨🇦' },
+      { code: 'CH', name: 'Switzerland', flag: '🇨🇭' },
+      { code: 'SN', name: 'Senegal', flag: '🇸🇳' },
+      { code: 'MA', name: 'Morocco', flag: '🇲🇦' },
+    ],
+  },
+  {
+    code: 'es',
+    name: 'Spanish',
+    nativeName: 'Español',
+    flag: '🇪🇸',
+    speechCode: 'es-ES',
+    regions: [
+      { code: 'ES', name: 'Spain', flag: '🇪🇸' },
+      { code: 'MX', name: 'Mexico', flag: '🇲🇽' },
+      { code: 'AR', name: 'Argentina', flag: '🇦🇷' },
+      { code: 'CO', name: 'Colombia', flag: '🇨🇴' },
+      { code: 'PE', name: 'Peru', flag: '🇵🇪' },
+      { code: 'CL', name: 'Chile', flag: '🇨🇱' },
+    ],
+  },
+  {
+    code: 'de',
+    name: 'German',
+    nativeName: 'Deutsch',
+    flag: '🇩🇪',
+    speechCode: 'de-DE',
+    regions: [
+      { code: 'DE', name: 'Germany', flag: '🇩🇪' },
+      { code: 'AT', name: 'Austria', flag: '🇦🇹' },
+      { code: 'CH', name: 'Switzerland', flag: '🇨🇭' },
+    ],
+  },
+  {
+    code: 'it',
+    name: 'Italian',
+    nativeName: 'Italiano',
+    flag: '🇮🇹',
+    speechCode: 'it-IT',
+    regions: [
+      { code: 'IT', name: 'Italy', flag: '🇮🇹' },
+      { code: 'CH', name: 'Switzerland', flag: '🇨🇭' },
+    ],
+  },
+  {
+    code: 'pt',
+    name: 'Portuguese',
+    nativeName: 'Português',
+    flag: '🇵🇹',
+    speechCode: 'pt-PT',
+    regions: [
+      { code: 'PT', name: 'Portugal', flag: '🇵🇹' },
+      { code: 'BR', name: 'Brazil', flag: '🇧🇷' },
+    ],
+  },
+  {
+    code: 'ja',
+    name: 'Japanese',
+    nativeName: '日本語',
+    flag: '🇯🇵',
+    speechCode: 'ja-JP',
+    regions: [
+      { code: 'JP', name: 'Japan', flag: '🇯🇵' },
+    ],
+  },
+  {
+    code: 'ko',
+    name: 'Korean',
+    nativeName: '한국어',
+    flag: '🇰🇷',
+    speechCode: 'ko-KR',
+    regions: [
+      { code: 'KR', name: 'South Korea', flag: '🇰🇷' },
+    ],
+  },
+  {
+    code: 'zh',
+    name: 'Chinese',
+    nativeName: '中文',
+    flag: '🇨🇳',
+    speechCode: 'zh-CN',
+    regions: [
+      { code: 'CN', name: 'China', flag: '🇨🇳' },
+      { code: 'TW', name: 'Taiwan', flag: '🇹🇼' },
+      { code: 'HK', name: 'Hong Kong', flag: '🇭🇰' },
+    ],
+  },
+  {
+    code: 'hi',
+    name: 'Hindi',
+    nativeName: 'हिन्दी',
+    flag: '🇮🇳',
+    speechCode: 'hi-IN',
+    regions: [
+      { code: 'IN', name: 'India', flag: '🇮🇳' },
+    ],
+  },
+  {
+    code: 'ar',
+    name: 'Arabic',
+    nativeName: 'العربية',
+    flag: '🇸🇦',
+    speechCode: 'ar-SA',
+    regions: [
+      { code: 'EG', name: 'Egypt', flag: '🇪🇬' },
+      { code: 'SA', name: 'Saudi Arabia', flag: '🇸🇦' },
+      { code: 'AE', name: 'UAE', flag: '🇦🇪' },
+      { code: 'MA', name: 'Morocco', flag: '🇲🇦' },
+    ],
+  },
+  {
+    code: 'ru',
+    name: 'Russian',
+    nativeName: 'Русский',
+    flag: '🇷🇺',
+    speechCode: 'ru-RU',
+    regions: [
+      { code: 'RU', name: 'Russia', flag: '🇷🇺' },
+    ],
+  },
+  {
+    code: 'tr',
+    name: 'Turkish',
+    nativeName: 'Türkçe',
+    flag: '🇹🇷',
+    speechCode: 'tr-TR',
+    regions: [
+      { code: 'TR', name: 'Turkey', flag: '🇹🇷' },
+    ],
+  },
+];
+
+// Get movies by language
+export async function getMoviesByLanguage(langCode: string, page = 1): Promise<TMDBResponse> {
   const res = await fetch(
-    `${TMDB_BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&with_original_language=fr&sort_by=popularity.desc&page=${page}`
+    `${TMDB_BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&with_original_language=${langCode}&sort_by=popularity.desc&page=${page}`
   );
   return res.json();
 }
 
-// Get popular movies by region (simulating TV5's global reach)
+// Get popular French movies (default - TV5 Monde content area)
+export async function getFrenchMovies(page = 1): Promise<TMDBResponse> {
+  return getMoviesByLanguage('fr', page);
+}
+
+// Get popular movies by region
 export async function getMoviesByRegion(
-  region: 'FR' | 'BE' | 'CA' | 'CH' | 'SN' | 'MA',
+  region: string,
   page = 1
 ): Promise<TMDBResponse> {
   const res = await fetch(
@@ -81,31 +238,31 @@ export async function getLanguages() {
   return res.json();
 }
 
-// Francophone regions (TV5 Monde coverage)
-export const FRANCOPHONE_REGIONS = [
-  { code: 'FR', name: 'France', flag: '🇫🇷' },
-  { code: 'BE', name: 'Belgium', flag: '🇧🇪' },
-  { code: 'CA', name: 'Canada (Quebec)', flag: '🇨🇦' },
-  { code: 'CH', name: 'Switzerland', flag: '🇨🇭' },
-  { code: 'SN', name: 'Senegal', flag: '🇸🇳' },
-  { code: 'MA', name: 'Morocco', flag: '🇲🇦' },
-  { code: 'TN', name: 'Tunisia', flag: '🇹🇳' },
-  { code: 'CI', name: 'Ivory Coast', flag: '🇨🇮' },
-];
+// Legacy: Francophone regions (TV5 Monde coverage)
+export const FRANCOPHONE_REGIONS = LEARNING_LANGUAGES[0].regions;
 
 export function getImageUrl(path: string | null, size = 'w500'): string {
   if (!path) return '/placeholder-movie.png';
   return `https://image.tmdb.org/t/p/${size}${path}`;
 }
 
-// Get movie videos (trailers from YouTube) - PRIORITIZE FRENCH
-export async function getMovieVideos(movieId: number) {
-  // First try to get French videos specifically
-  const frRes = await fetch(
-    `${TMDB_BASE_URL}/movie/${movieId}/videos?api_key=${TMDB_API_KEY}&language=fr-FR`
+// Get movie videos (trailers from YouTube) - PRIORITIZE target language
+export async function getMovieVideos(movieId: number, langCode = 'fr') {
+  // Language-specific speech codes for TMDB
+  const langMap: Record<string, string> = {
+    'fr': 'fr-FR', 'es': 'es-ES', 'de': 'de-DE', 'it': 'it-IT',
+    'pt': 'pt-PT', 'ja': 'ja-JP', 'ko': 'ko-KR', 'zh': 'zh-CN',
+    'hi': 'hi-IN', 'ar': 'ar-SA', 'ru': 'ru-RU', 'tr': 'tr-TR'
+  };
+
+  const tmdbLang = langMap[langCode] || `${langCode}-${langCode.toUpperCase()}`;
+
+  // First try to get target language videos specifically
+  const langRes = await fetch(
+    `${TMDB_BASE_URL}/movie/${movieId}/videos?api_key=${TMDB_API_KEY}&language=${tmdbLang}`
   );
-  const frData = await frRes.json();
-  const frVideos = frData.results || [];
+  const langData = await langRes.json();
+  const langVideos = langData.results || [];
 
   // Then get all videos as fallback
   const allRes = await fetch(
@@ -115,41 +272,44 @@ export async function getMovieVideos(movieId: number) {
   const allVideos = allData.results || [];
 
   // Combine and dedupe
-  const allVideoIds = new Set(allVideos.map((v: any) => v.id));
-  const combinedVideos = [...frVideos, ...allVideos.filter((v: any) => !frVideos.some((fv: any) => fv.id === v.id))];
+  const combinedVideos = [...langVideos, ...allVideos.filter((v: any) => !langVideos.some((lv: any) => lv.id === v.id))];
 
-  // Priority order for finding the best video:
-  // 1. French trailer
-  // 2. French teaser
-  // 3. French clip
-  // 4. Any French video
-  // 5. Original language trailer (for French movies)
-  // 6. Any trailer
-  // 7. Any video
+  // Priority order:
+  // 1. Target language trailer
+  // 2. Target language teaser
+  // 3. Target language clip
+  // 4. Any target language video
+  // 5. Any trailer
+  // 6. Any video
 
-  const frenchTrailer = combinedVideos.find(
-    (v: any) => v.site === 'YouTube' && v.type === 'Trailer' && v.iso_639_1 === 'fr'
+  const targetTrailer = combinedVideos.find(
+    (v: any) => v.site === 'YouTube' && v.type === 'Trailer' && v.iso_639_1 === langCode
   );
-  const frenchTeaser = combinedVideos.find(
-    (v: any) => v.site === 'YouTube' && v.type === 'Teaser' && v.iso_639_1 === 'fr'
+  const targetTeaser = combinedVideos.find(
+    (v: any) => v.site === 'YouTube' && v.type === 'Teaser' && v.iso_639_1 === langCode
   );
-  const frenchClip = combinedVideos.find(
-    (v: any) => v.site === 'YouTube' && v.type === 'Clip' && v.iso_639_1 === 'fr'
+  const targetClip = combinedVideos.find(
+    (v: any) => v.site === 'YouTube' && v.type === 'Clip' && v.iso_639_1 === langCode
   );
-  const anyFrenchVideo = combinedVideos.find(
-    (v: any) => v.site === 'YouTube' && v.iso_639_1 === 'fr'
+  const anyTargetVideo = combinedVideos.find(
+    (v: any) => v.site === 'YouTube' && v.iso_639_1 === langCode
   );
   const anyTrailer = combinedVideos.find(
     (v: any) => v.site === 'YouTube' && v.type === 'Trailer'
   );
   const anyVideo = combinedVideos.find((v: any) => v.site === 'YouTube');
 
-  const selected = frenchTrailer || frenchTeaser || frenchClip || anyFrenchVideo || anyTrailer || anyVideo || null;
+  const selected = targetTrailer || targetTeaser || targetClip || anyTargetVideo || anyTrailer || anyVideo || null;
 
-  // Add flag to indicate if it's French
+  // Add flag to indicate if it's in target language
   if (selected) {
-    selected.isFrench = selected.iso_639_1 === 'fr';
+    selected.isTargetLanguage = selected.iso_639_1 === langCode;
   }
 
   return selected;
+}
+
+// Helper to get language by code
+export function getLanguageByCode(code: string): LearningLanguage | undefined {
+  return LEARNING_LANGUAGES.find(l => l.code === code);
 }

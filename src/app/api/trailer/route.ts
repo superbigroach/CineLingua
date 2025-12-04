@@ -4,13 +4,14 @@ import { getMovieVideos } from '@/lib/tmdb';
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const movieId = searchParams.get('movieId');
+  const lang = searchParams.get('lang') || 'fr'; // Default to French
 
   if (!movieId) {
     return NextResponse.json({ error: 'Movie ID required' }, { status: 400 });
   }
 
   try {
-    const video = await getMovieVideos(parseInt(movieId));
+    const video = await getMovieVideos(parseInt(movieId), lang);
 
     if (video) {
       return NextResponse.json({
@@ -18,7 +19,7 @@ export async function GET(request: NextRequest) {
         name: video.name,
         type: video.type,
         language: video.iso_639_1,
-        isFrench: video.isFrench || video.iso_639_1 === 'fr',
+        isTargetLanguage: video.isTargetLanguage || video.iso_639_1 === lang,
       });
     }
 

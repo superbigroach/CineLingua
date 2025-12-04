@@ -5,7 +5,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
 export async function POST(request: NextRequest) {
   try {
-    const { message, movieTitle, movieOverview, history } = await request.json();
+    const { message, movieTitle, movieOverview, language = 'French', history } = await request.json();
 
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
       .map((m: any) => `${m.role === 'user' ? 'User' : 'Tutor'}: ${m.content}`)
       .join('\n');
 
-    const prompt = `You are a friendly French language tutor helping someone learn French through movies.
+    const prompt = `You are a friendly ${language} language tutor helping someone learn ${language} through movies.
 You're currently discussing the movie "${movieTitle}".
 
 Movie synopsis: ${movieOverview}
@@ -26,14 +26,14 @@ User's new message: ${message}
 
 Instructions:
 - Be helpful and encouraging
-- If asked about French words/phrases, provide translation, pronunciation tips, and examples
+- If asked about ${language} words/phrases, provide translation, pronunciation tips, and examples
 - If asked grammar questions, explain clearly with examples
 - Keep responses concise but informative (2-3 paragraphs max)
-- Use some French words naturally (with translations in parentheses)
+- Use some ${language} words naturally (with translations in parentheses)
 - If relevant, connect your answer to the movie being discussed
 - Be conversational and friendly
 
-Respond naturally as a tutor:`;
+Respond naturally as a ${language} tutor:`;
 
     const result = await model.generateContent(prompt);
     const response = result.response.text();

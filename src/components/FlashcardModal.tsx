@@ -11,11 +11,13 @@ interface VocabItem {
 interface FlashcardModalProps {
   vocabulary: VocabItem[];
   movieTitle: string;
+  language?: string;
+  speechCode?: string;
   onWordLearned: (word: string) => void;
   onClose: () => void;
 }
 
-export default function FlashcardModal({ vocabulary, movieTitle, onWordLearned, onClose }: FlashcardModalProps) {
+export default function FlashcardModal({ vocabulary, movieTitle, language = 'French', speechCode = 'fr-FR', onWordLearned, onClose }: FlashcardModalProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [knownWords, setKnownWords] = useState<string[]>([]);
@@ -25,10 +27,10 @@ export default function FlashcardModal({ vocabulary, movieTitle, onWordLearned, 
   const currentCard = vocabulary[currentIndex];
   const progress = ((knownWords.length + learningWords.length) / vocabulary.length) * 100;
 
-  const speak = (text: string, lang = 'fr-FR') => {
+  const speak = (text: string, lang?: string) => {
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = lang;
+      utterance.lang = lang || speechCode;
       utterance.rate = 0.8;
       speechSynthesis.speak(utterance);
     }

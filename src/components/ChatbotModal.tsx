@@ -10,14 +10,33 @@ interface Message {
 interface ChatbotModalProps {
   movieTitle: string;
   movieOverview: string;
+  language?: string;
+  languageCode?: string;
   onClose: () => void;
 }
 
-export default function ChatbotModal({ movieTitle, movieOverview, onClose }: ChatbotModalProps) {
+// Greeting in each language
+const greetings: Record<string, string> = {
+  fr: 'Bonjour',
+  es: 'Hola',
+  de: 'Hallo',
+  it: 'Ciao',
+  pt: 'Olá',
+  ja: 'こんにちは',
+  ko: '안녕하세요',
+  zh: '你好',
+  hi: 'नमस्ते',
+  ar: 'مرحبا',
+  ru: 'Привет',
+  tr: 'Merhaba',
+};
+
+export default function ChatbotModal({ movieTitle, movieOverview, language = 'French', languageCode = 'fr', onClose }: ChatbotModalProps) {
+  const greeting = greetings[languageCode] || 'Hello';
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: `Bonjour! I'm your French language tutor. We're learning with "${movieTitle}". Ask me anything about French words, phrases, grammar, or the movie! 🎬`,
+      content: `${greeting}! I'm your ${language} language tutor. We're learning with "${movieTitle}". Ask me anything about ${language} words, phrases, grammar, or the movie! 🎬`,
     },
   ]);
   const [input, setInput] = useState('');
@@ -29,10 +48,10 @@ export default function ChatbotModal({ movieTitle, movieOverview, onClose }: Cha
   }, [messages]);
 
   const quickQuestions = [
-    "How do I say 'I love this movie' in French?",
-    "Explain the word 'amour'",
-    "Common French movie phrases?",
-    "French pronunciation tips",
+    `How do I say 'I love this movie' in ${language}?`,
+    `What are common ${language} greetings?`,
+    `Common ${language} movie phrases?`,
+    `${language} pronunciation tips`,
   ];
 
   const handleSend = async (text?: string) => {
@@ -52,6 +71,7 @@ export default function ChatbotModal({ movieTitle, movieOverview, onClose }: Cha
           message: messageText,
           movieTitle,
           movieOverview,
+          language,
           history: messages.slice(-6), // Last 6 messages for context
         }),
       });
@@ -83,7 +103,7 @@ export default function ChatbotModal({ movieTitle, movieOverview, onClose }: Cha
                 <i className="fas fa-robot text-white"></i>
               </div>
               <div>
-                <h2 className="font-bold">French Tutor</h2>
+                <h2 className="font-bold">{language} Tutor</h2>
                 <p className="text-xs text-white/50">Powered by Gemini</p>
               </div>
             </div>
@@ -155,7 +175,7 @@ export default function ChatbotModal({ movieTitle, movieOverview, onClose }: Cha
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask about French..."
+              placeholder={`Ask about ${language}...`}
               className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-cyan-500/50"
               disabled={isLoading}
             />

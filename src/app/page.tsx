@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Movie, FRANCOPHONE_REGIONS, getImageUrl } from '@/lib/tmdb';
+import { Movie, FRANCOPHONE_REGIONS, LEARNING_LANGUAGES, LearningLanguage, getImageUrl, getLanguageByCode } from '@/lib/tmdb';
 import {
   User, getCurrentUser, loginUser, logoutUser, getLevelFromXP,
   recordMovieWatched, recordWordLearned, recordQuizResult, addXP, XP_REWARDS
@@ -105,6 +105,7 @@ export default function Home() {
   // Core state
   const [movies, setMovies] = useState<Movie[]>([]);
   const [selectedRegion, setSelectedRegion] = useState<string>('');
+  const [selectedLanguage, setSelectedLanguage] = useState<LearningLanguage>(LEARNING_LANGUAGES[0]); // Default: French
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [learningContent, setLearningContent] = useState<any>(null);
   const [trailerKey, setTrailerKey] = useState<string | null>(null);
@@ -141,7 +142,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchMovies();
-  }, [selectedRegion]);
+  }, [selectedRegion, selectedLanguage]);
 
   async function fetchMovies() {
     setLoading(true);
@@ -150,7 +151,8 @@ export default function Home() {
       if (selectedRegion) {
         params.set('region', selectedRegion);
       } else {
-        params.set('type', 'french');
+        // Use selected language code
+        params.set('lang', selectedLanguage.code);
       }
 
       const res = await fetch(`/api/movies?${params}`);
@@ -177,9 +179,11 @@ export default function Home() {
             action: 'movie-content',
             title: movie.original_title || movie.title,
             overview: movie.overview,
+            language: selectedLanguage.name,
+            languageCode: selectedLanguage.code,
           }),
         }),
-        fetch(`/api/trailer?movieId=${movie.id}`),
+        fetch(`/api/trailer?movieId=${movie.id}&lang=${selectedLanguage.code}`),
       ]);
 
       const contentData = await contentRes.json();
@@ -219,6 +223,7 @@ export default function Home() {
         body: JSON.stringify({
           action: 'quiz',
           content: `Movie: ${selectedMovie.title}\nVocabulary: ${learningContent.vocabulary?.map((v: any) => v.word).join(', ')}\nPhrases: ${learningContent.phrases?.map((p: any) => p.phrase).join(', ')}`,
+          language: selectedLanguage.name,
         }),
       });
 
@@ -253,7 +258,7 @@ export default function Home() {
   function handleLogin(loggedInUser: User) {
     setUser(loggedInUser);
     setShowLoginModal(false);
-    showToast('Welcome! Start learning French!', 'success');
+    showToast(`Welcome! Start learning ${selectedLanguage.name}!`, 'success');
   }
 
   function handleLogout() {
@@ -271,10 +276,10 @@ export default function Home() {
     setToast({ message, type });
   }
 
-  function speak(text: string, lang = 'fr-FR') {
+  function speak(text: string, lang?: string) {
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = lang;
+      utterance.lang = lang || selectedLanguage.speechCode;
       utterance.rate = 0.8;
       speechSynthesis.speak(utterance);
     }
@@ -376,8 +381,30 @@ export default function Home() {
             <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Lingua</span>
           </h1>
           <p className="text-sm text-white/60 max-w-lg mb-3">
-            Learn French through cinema with AI tutoring, quizzes, and flashcards
+            Learn {selectedLanguage.name} through cinema with AI tutoring, quizzes, and flashcards
           </p>
+
+          {/* Language Selector */}
+          <div className="flex flex-wrap justify-center gap-1.5 mb-4">
+            {LEARNING_LANGUAGES.map((lang) => (
+              <button
+                key={lang.code}
+                onClick={() => {
+                  setSelectedLanguage(lang);
+                  setSelectedRegion(''); // Reset region when changing language
+                }}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border flex items-center gap-1.5 ${
+                  selectedLanguage.code === lang.code
+                    ? 'border-cyan-500/50 bg-cyan-500/20 text-cyan-400 shadow-lg shadow-cyan-500/20'
+                    : 'border-white/10 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white'
+                }`}
+                title={lang.nativeName}
+              >
+                <span className="text-base">{lang.flag}</span>
+                <span className="hidden sm:inline">{lang.name}</span>
+              </button>
+            ))}
+          </div>
 
           {!user && (
             <button
@@ -394,34 +421,36 @@ export default function Home() {
       {/* Main Content Area */}
       <div className="max-w-[1800px] mx-auto px-4 pb-20">
 
-        {/* Region Selector */}
-        <section id="regions" className="mb-6">
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => setSelectedRegion('')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
-                selectedRegion === ''
-                  ? 'border-cyan-500/50 bg-cyan-500/20 text-cyan-400'
-                  : 'border-white/10 bg-white/5 hover:bg-white/10 text-white/70'
-              }`}
-            >
-              <span>All French</span>
-            </button>
-            {FRANCOPHONE_REGIONS.map((region) => (
+        {/* Region Selector - Shows regions for selected language */}
+        {selectedLanguage.regions.length > 1 && (
+          <section id="regions" className="mb-6">
+            <div className="flex flex-wrap gap-2">
               <button
-                key={region.code}
-                onClick={() => setSelectedRegion(region.code)}
+                onClick={() => setSelectedRegion('')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
-                  selectedRegion === region.code
+                  selectedRegion === ''
                     ? 'border-cyan-500/50 bg-cyan-500/20 text-cyan-400'
                     : 'border-white/10 bg-white/5 hover:bg-white/10 text-white/70'
                 }`}
               >
-                {region.flag} {region.code}
+                <span>All {selectedLanguage.name}</span>
               </button>
-            ))}
-          </div>
-        </section>
+              {selectedLanguage.regions.map((region) => (
+                <button
+                  key={region.code}
+                  onClick={() => setSelectedRegion(region.code)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
+                    selectedRegion === region.code
+                      ? 'border-cyan-500/50 bg-cyan-500/20 text-cyan-400'
+                      : 'border-white/10 bg-white/5 hover:bg-white/10 text-white/70'
+                  }`}
+                >
+                  {region.flag} {region.name}
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Trailer Player Section */}
         {selectedMovie && (
@@ -468,7 +497,7 @@ export default function Home() {
                   <div className="grid grid-cols-2 gap-3">
                     <div className="p-3 bg-blue-500/10 rounded-xl border border-blue-500/20">
                       <p className="text-[10px] text-blue-400 mb-1 flex items-center gap-1">
-                        <span>🇫🇷</span> Français
+                        <span>{selectedLanguage.flag}</span> {selectedLanguage.nativeName}
                       </p>
                       <p className="text-white/80 text-xs leading-relaxed">
                         {selectedMovie.original_title !== selectedMovie.title
@@ -525,8 +554,8 @@ export default function Home() {
           {/* LEFT: Movies Grid */}
           <section id="movies">
             <h2 className="text-base font-bold mb-3 flex items-center gap-2">
-              <span className="text-purple-400 text-sm">🎬</span>
-              <span>Popular French Movies</span>
+              <span className="text-purple-400 text-sm">{selectedLanguage.flag}</span>
+              <span>Popular {selectedLanguage.name} Movies</span>
             </h2>
 
             {loading ? (
@@ -739,6 +768,9 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t border-white/10 bg-black/30 py-4">
         <div className="max-w-[1800px] mx-auto px-4 text-center">
+          <p className="text-white/40 text-xs mb-1">
+            Currently learning: <span className="text-cyan-400">{selectedLanguage.flag} {selectedLanguage.name} ({selectedLanguage.nativeName})</span>
+          </p>
           <p className="text-white/40 text-xs">Built for Agentics TV5 Hackathon 2025</p>
           <p className="text-purple-400 text-xs font-medium">
             Powered by Google Gemini AI
@@ -748,13 +780,15 @@ export default function Home() {
 
       {/* Modals */}
       {showLoginModal && (
-        <LoginModal onLogin={handleLogin} onClose={() => setShowLoginModal(false)} />
+        <LoginModal onLogin={handleLogin} onClose={() => setShowLoginModal(false)} language={selectedLanguage.code} />
       )}
 
       {showQuiz && quizQuestions.length > 0 && selectedMovie && (
         <QuizModal
           questions={quizQuestions}
           movieTitle={selectedMovie.title}
+          language={selectedLanguage.name}
+          languageCode={selectedLanguage.code}
           onComplete={handleQuizComplete}
           onClose={() => setShowQuiz(false)}
         />
@@ -764,6 +798,8 @@ export default function Home() {
         <FlashcardModal
           vocabulary={learningContent.vocabulary}
           movieTitle={selectedMovie.title}
+          language={selectedLanguage.name}
+          speechCode={selectedLanguage.speechCode}
           onWordLearned={handleWordLearned}
           onClose={() => setShowFlashcards(false)}
         />
@@ -773,6 +809,8 @@ export default function Home() {
         <ChatbotModal
           movieTitle={selectedMovie.title}
           movieOverview={selectedMovie.overview}
+          language={selectedLanguage.name}
+          languageCode={selectedLanguage.code}
           onClose={() => setShowChatbot(false)}
         />
       )}
