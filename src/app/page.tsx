@@ -169,9 +169,9 @@ export default function Home() {
 
       {/* Hero Section */}
       <section className="min-h-[80vh] flex items-center justify-center pt-24 pb-12 px-6">
-        <div className="text-center max-w-3xl">
+        <div className="w-full max-w-3xl mx-auto flex flex-col items-center text-center">
           {/* Icon */}
-          <div className="relative w-28 h-28 mx-auto mb-8">
+          <div className="relative w-28 h-28 mb-8">
             <div className="absolute inset-[-30px] rounded-full bg-[radial-gradient(circle,rgba(6,182,212,0.2)_0%,transparent_70%)] animate-pulse" />
             <div className="relative w-full h-full rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/30">
               <i className="fas fa-film text-white text-4xl"></i>
@@ -183,7 +183,7 @@ export default function Home() {
             <span className="text-white">Cine</span>
             <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Lingua</span>
           </h1>
-          <p className="text-lg text-white/60 max-w-xl mx-auto mb-8">
+          <p className="text-lg text-white/60 max-w-xl mb-8">
             Learn French through cinema. Discover movies from Francophone regions and master the language with AI tutoring.
           </p>
 
