@@ -3,6 +3,31 @@
 import { useState, useEffect, useRef } from 'react';
 import { Movie, FRANCOPHONE_REGIONS, getImageUrl } from '@/lib/tmdb';
 
+// Toast Notification Component
+function Toast({ message, onClose }: { message: string; onClose: () => void }) {
+  useEffect(() => {
+    const timer = setTimeout(onClose, 5000);
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  return (
+    <div className="fixed bottom-6 right-6 z-50 animate-slide-up">
+      <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-6 py-4 rounded-2xl shadow-2xl shadow-green-500/30 flex items-center gap-3 max-w-sm">
+        <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+          <i className="fas fa-robot text-xl"></i>
+        </div>
+        <div>
+          <p className="font-bold text-sm">AI Tutor Ready!</p>
+          <p className="text-white/90 text-xs">{message}</p>
+        </div>
+        <button onClick={onClose} className="ml-2 text-white/60 hover:text-white">
+          <i className="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // Sparkle Canvas Component
 function SparkleCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -76,6 +101,9 @@ export default function Home() {
   const [trailerKey, setTrailerKey] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingContent, setLoadingContent] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [contentReady, setContentReady] = useState(false);
+  const tutorPanelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchMovies();
@@ -105,6 +133,7 @@ export default function Home() {
     setSelectedMovie(movie);
     setLoadingContent(true);
     setTrailerKey(null);
+    setContentReady(false);
 
     try {
       const [contentRes, trailerRes] = await Promise.all([
@@ -127,6 +156,15 @@ export default function Home() {
         const trailerData = await trailerRes.json();
         setTrailerKey(trailerData.key);
       }
+
+      // Show toast and trigger glow effect when content is ready
+      setContentReady(true);
+      setShowToast(true);
+
+      // Scroll to tutor panel on mobile, or highlight it on desktop
+      if (window.innerWidth < 1280 && tutorPanelRef.current) {
+        tutorPanelRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     } catch (error) {
       console.error('Failed to load content:', error);
     } finally {
@@ -135,13 +173,30 @@ export default function Home() {
   }
 
   // AI Tutor Panel Component (reusable)
-  const AITutorPanel = ({ className = "" }: { className?: string }) => (
-    <div className={`bg-[rgba(5,5,8,0.95)] backdrop-blur-xl rounded-2xl p-5 border border-white/10 shadow-xl ${className}`}>
-      <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center">
-          <i className="fas fa-robot text-white text-sm"></i>
+  const AITutorPanel = ({ className = "", isMain = false }: { className?: string; isMain?: boolean }) => (
+    <div
+      ref={isMain ? tutorPanelRef : undefined}
+      className={`relative bg-[rgba(5,5,8,0.95)] backdrop-blur-xl rounded-2xl p-5 border shadow-xl transition-all duration-500 ${
+        contentReady && learningContent
+          ? 'border-green-500/50 shadow-green-500/20 shadow-2xl'
+          : 'border-white/10'
+      } ${className}`}
+    >
+      {/* Pulsing glow effect when content ready */}
+      {contentReady && learningContent && (
+        <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-green-500/10 to-emerald-500/10 animate-pulse pointer-events-none" />
+      )}
+
+      <h2 className="relative text-lg font-bold mb-4 flex items-center gap-2">
+        <div className={`w-10 h-10 rounded-xl bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center ${contentReady && learningContent ? 'animate-bounce' : ''}`}>
+          <i className="fas fa-robot text-white text-lg"></i>
         </div>
-        <span>AI Language Tutor</span>
+        <div>
+          <span className="block">AI Language Tutor</span>
+          {contentReady && learningContent && (
+            <span className="text-[10px] text-green-400 font-normal">Vocabulary ready! Review while watching</span>
+          )}
+        </div>
         <span className="text-[10px] px-2 py-0.5 rounded bg-green-500/20 text-green-400 border border-green-500/30 ml-auto">
           Gemini
         </span>
@@ -453,14 +508,14 @@ export default function Home() {
           {/* RIGHT: AI Tutor Panel - Sticky on desktop */}
           <aside className="hidden xl:block">
             <div className="sticky top-24">
-              <AITutorPanel />
+              <AITutorPanel isMain={true} />
             </div>
           </aside>
         </div>
 
         {/* Mobile AI Tutor - Only shown on smaller screens */}
         <div className="xl:hidden mt-8">
-          <AITutorPanel />
+          <AITutorPanel isMain={true} />
         </div>
 
         {/* How It Works Section */}
@@ -533,6 +588,31 @@ export default function Home() {
           </p>
         </div>
       </footer>
+
+      {/* Toast notification */}
+      {showToast && selectedMovie && (
+        <Toast
+          message={`Vocabulary for "${selectedMovie.title}" is ready! Check the AI Tutor panel →`}
+          onClose={() => setShowToast(false)}
+        />
+      )}
+
+      {/* CSS Animation styles */}
+      <style jsx global>{`
+        @keyframes slide-up {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-slide-up {
+          animation: slide-up 0.3s ease-out;
+        }
+      `}</style>
     </main>
   );
 }
