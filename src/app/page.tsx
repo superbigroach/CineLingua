@@ -239,9 +239,9 @@ export default function Home() {
     }
   }
 
-  function handleQuizComplete(correct: number, total: number) {
+  async function handleQuizComplete(correct: number, total: number) {
     if (user) {
-      const result = recordQuizResult(user.id, correct, total);
+      const result = await recordQuizResult(user.id, correct, total);
       showToast(`+${result.xpEarned} XP${result.perfect ? ' - PERFECT!' : ''}`, result.perfect ? 'level' : 'xp');
       refreshUser();
     }
