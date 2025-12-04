@@ -5,82 +5,202 @@
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-cine--lingua.vercel.app-purple)](https://cine-lingua.vercel.app)
 [![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org)
 [![Google AI](https://img.shields.io/badge/Google%20AI-Gemini-blue)](https://ai.google.dev)
+[![Supabase](https://img.shields.io/badge/Supabase-Database-green)](https://supabase.com)
 
-An AI-powered language learning platform that helps users discover popular movies from Francophone regions worldwide and learn French through cinema. Watch trailers, learn vocabulary, and immerse yourself in French culture!
+An AI-powered language learning platform that helps users discover popular movies from Francophone regions worldwide and learn French through cinema. Watch trailers, learn vocabulary, take quizzes, compete on leaderboards, and immerse yourself in French culture!
 
 ## Live Demo
 
 **Try it now:** [https://cine-lingua.vercel.app](https://cine-lingua.vercel.app)
 
-## How It Works
+---
 
-CineLingua is a **movie discovery and language preparation tool**. Here's the learning flow:
+## How to Use CineLingua (Step-by-Step Guide)
 
-1. **Browse Movies** - Explore popular French films from 8+ Francophone regions (France, Belgium, Canada, Senegal, Morocco, etc.)
-2. **Watch Trailers** - Preview movies with embedded YouTube trailers featuring authentic French dialogue
-3. **Learn Vocabulary** - AI generates key words, phrases, and cultural context specific to each film
-4. **Watch & Understand** - Use your new knowledge to enjoy the full movie with better comprehension!
+### Getting Started
 
-## Sponsor Integrations
+1. **Visit the App** - Go to [cine-lingua.vercel.app](https://cine-lingua.vercel.app)
+2. **Create Account** (Optional but recommended)
+   - Click the **"Login"** button in the top-right corner
+   - Enter your name and email
+   - Click **"Start Learning French!"**
+   - Your progress will now be tracked and saved
 
-| Sponsor | Integration | How It's Used |
-|---------|-------------|---------------|
-| **TV5 Monde** | French content from Francophone regions | Movies from France, Belgium, Canada, Senegal, Morocco, Tunisia, Ivory Coast, Switzerland via TMDB API |
-| **Google AI** | Gemini-powered language tutor | Generates vocabulary, phrases, cultural context, and practice questions for each movie |
-| **YouTube** | Video player for trailers | Embedded trailer player with French closed captions enabled |
+### Browsing Movies
 
-## Features
+1. **View Movie Grid** - You'll see 16 popular French movies displayed as posters
+2. **Filter by Region** - Click any flag button to see movies from specific Francophone regions:
+   - 🇫🇷 France | 🇧🇪 Belgium | 🇨🇦 Canada | 🇨🇭 Switzerland
+   - 🇸🇳 Senegal | 🇲🇦 Morocco | 🇹🇳 Tunisia | 🇨🇮 Ivory Coast
+3. **Click "All French"** to see movies from all regions
 
-- **Regional Discovery** - Explore popular movies from 8 Francophone regions with flags and filters
-- **AI Language Tutor** - Gemini generates vocabulary with difficulty levels (beginner/intermediate/advanced)
-- **YouTube Trailer Player** - Watch trailers with French captions to hear authentic pronunciation
-- **Useful Phrases** - Learn common expressions and idioms used in each film
-- **Cultural Context** - Understand the cultural significance and themes of French cinema
-- **Practice Questions** - AI-generated comprehension questions to test your understanding
-- **Beautiful UI** - Modern dark theme with purple accents, responsive design
+### Learning from a Movie
 
-## Quick Start
+1. **Click any movie poster** - This triggers the learning experience:
+   - ✅ YouTube trailer loads automatically (with French captions)
+   - ✅ AI generates vocabulary and phrases
+   - ✅ You earn **+10 XP** for exploring
+   - ✅ Side-by-side French/English title appears
+
+2. **Watch the Trailer** - Listen to authentic French dialogue with captions enabled
+
+3. **Study Vocabulary** (Right panel on desktop, below trailer on mobile)
+   - See 6+ vocabulary words with translations
+   - Each word shows difficulty level (beginner/intermediate/advanced)
+   - **Click the speaker icon** 🔊 to hear pronunciation
+
+4. **Read Useful Phrases** - Common expressions from the movie with meanings
+
+### Interactive Features
+
+#### Take a Quiz
+1. Click the **"Quiz"** button (purple brain icon)
+2. Answer multiple-choice questions about the vocabulary
+3. See instant feedback - green for correct, red for wrong
+4. Get explanations after each question
+5. Earn **+25 XP** for completing, **+50 XP** for perfect score!
+
+#### Practice with Flashcards
+1. Click the **"Flashcards"** button (cyan cards icon)
+2. See a French word on the card
+3. **Click the card** to flip and reveal the English translation
+4. **Swipe right** or click ✓ if you know it (earns +5 XP)
+5. **Swipe left** or click ✗ to keep practicing
+6. Click 🔊 to hear pronunciation
+
+#### Chat with AI Tutor
+1. Click the **"Ask AI"** button (green robot icon)
+2. Type any question about French language or the movie
+3. Use quick suggestions like "Explain the grammar" or "More vocabulary"
+4. Have a conversation - the AI remembers context!
+
+### Gamification Features
+
+#### XP & Leveling
+- **Watch trailer**: +10 XP
+- **Learn a word**: +5 XP
+- **Complete quiz**: +25 XP
+- **Perfect quiz**: +50 XP
+- **Daily streak**: +15 XP
+- **Invite friend**: +100 XP
+
+#### 10 Levels to Achieve
+| Level | Title | XP Required |
+|-------|-------|-------------|
+| 1 | Débutant | 0 |
+| 2 | Novice | 100 |
+| 3 | Apprenti | 300 |
+| 4 | Intermédiaire | 600 |
+| 5 | Avancé | 1,000 |
+| 6 | Expert | 1,500 |
+| 7 | Maître | 2,100 |
+| 8 | Grand Maître | 2,800 |
+| 9 | Virtuose | 3,600 |
+| 10 | Francophile | 5,000 |
+
+#### Leaderboard
+1. Click the **trophy icon** 🏆 in the navbar
+2. View rankings for: Daily | Weekly | Monthly | All-Time
+3. See your position among all learners
+4. Top 3 get gold, silver, bronze medals!
+
+#### Invite Friends
+1. Click the **invite icon** 👤+ in the navbar
+2. Enter friend's email to send invite (+100 XP)
+3. Or share via Twitter, WhatsApp, LinkedIn
+4. Copy the link to share anywhere
+
+### Navbar Features (When Logged In)
+- **⭐ XP Counter** - Your total experience points
+- **🔥 Streak** - Days in a row you've learned
+- **🏆 Trophy** - Open leaderboard
+- **👤+ Invite** - Invite friends
+- **Avatar** - Your profile with level title
+
+---
+
+## Features Summary
+
+### Core Learning
+- Regional movie discovery from 8+ Francophone countries
+- AI-generated vocabulary with difficulty levels
+- YouTube trailers with French captions
+- Useful phrases with contextual meanings
+- Side-by-side English/French translation
+- Text-to-speech pronunciation (Web Speech API)
+
+### Gamification
+- XP rewards for all learning activities
+- 10-level progression system with French titles
+- Daily streak tracking
+- Interactive quizzes with instant feedback
+- Swipeable flashcard learning
+- AI chatbot tutor (powered by Gemini)
+
+### Social
+- Global leaderboard (daily/weekly/monthly/all-time)
+- Friend invites via email
+- Social sharing (Twitter, WhatsApp, LinkedIn)
+- Cloud-synced progress (Supabase)
+
+---
+
+## Quick Start (For Developers)
 
 ### Prerequisites
-- Node.js 18+ installed
+- Node.js 18+
 - Free API keys (instructions below)
 
-### 1. Clone the Repository
+### 1. Clone & Install
 
 ```bash
 git clone https://github.com/superbigroach/CineLingua.git
 cd CineLingua
+npm install
 ```
 
-### 2. Get Free API Keys
+### 2. Get API Keys
 
-**TMDB** (Movie Database - 100% FREE):
-1. Go to https://www.themoviedb.org/signup
-2. Create account → Settings → API → Request API key
-3. Copy the "API Key (v3 auth)"
+**TMDB** (Movie Database - FREE):
+1. Sign up at https://www.themoviedb.org/signup
+2. Go to Settings → API → Request API key
+3. Copy "API Key (v3 auth)"
 
-**Google Gemini** (AI - FREE tier: 60 requests/minute):
+**Google Gemini** (AI - FREE tier):
 1. Go to https://aistudio.google.com/apikey
-2. Sign in with Google
-3. Click "Create API key"
+2. Sign in with Google → Create API key
+
+**Supabase** (Database - FREE tier):
+1. Go to https://supabase.com
+2. Create new project
+3. Copy Project URL and anon key from Settings → API
 
 ### 3. Configure Environment
 
-Create a `.env.local` file in the project root:
+Create `.env.local`:
 
 ```env
-NEXT_PUBLIC_TMDB_API_KEY=your_tmdb_key_here
-GEMINI_API_KEY=your_gemini_key_here
+NEXT_PUBLIC_TMDB_API_KEY=your_tmdb_key
+GEMINI_API_KEY=your_gemini_key
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 ```
 
-### 4. Install & Run
+### 4. Set Up Database
+
+1. Go to Supabase Dashboard → SQL Editor
+2. Copy contents of `supabase-schema.sql`
+3. Run the query
+
+### 5. Run Locally
 
 ```bash
-npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open http://localhost:3000
+
+---
 
 ## Project Structure
 
@@ -88,131 +208,73 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 cinelingua/
 ├── src/
 │   ├── app/
-│   │   ├── page.tsx              # Main UI with movie grid, trailer player, AI tutor
-│   │   ├── layout.tsx            # App layout with metadata
+│   │   ├── page.tsx              # Main app with all features
 │   │   └── api/
-│   │       ├── movies/route.ts   # TMDB API - fetches French movies by region
-│   │       ├── learn/route.ts    # Gemini AI - generates learning content
-│   │       └── trailer/route.ts  # YouTube trailer - fetches video IDs
+│   │       ├── movies/route.ts   # TMDB movie fetching
+│   │       ├── learn/route.ts    # Gemini AI vocabulary/quiz
+│   │       ├── chat/route.ts     # AI chatbot
+│   │       └── trailer/route.ts  # YouTube trailer
+│   ├── components/
+│   │   ├── LoginModal.tsx        # User registration
+│   │   ├── QuizModal.tsx         # Interactive quiz
+│   │   ├── FlashcardModal.tsx    # Swipeable cards
+│   │   ├── ChatbotModal.tsx      # AI conversation
+│   │   ├── LeaderboardModal.tsx  # Rankings
+│   │   └── InviteFriendModal.tsx # Social sharing
 │   └── lib/
-│       ├── tmdb.ts               # TMDB client - French movies, regions, trailers
-│       └── gemini.ts             # Gemini AI agents - vocab, phrases, cultural context
-├── .env.local                    # API keys (create this file, not in git)
-├── package.json
+│       ├── supabase.ts           # Database client
+│       ├── userStore.ts          # User/XP management
+│       ├── tmdb.ts               # Movie API
+│       └── gemini.ts             # AI agents
+├── supabase-schema.sql           # Database tables
 └── README.md
 ```
 
-## AI Agents (Gemini-powered)
-
-CineLingua uses Google's Gemini AI to power intelligent language tutoring:
-
-| Agent | Function |
-|-------|----------|
-| **Movie Content Agent** | Analyzes film synopsis to extract vocabulary and phrases |
-| **Vocabulary Agent** | Provides word definitions, translations, pronunciation guides |
-| **Cultural Agent** | Explains French cultural context and film themes |
-| **Quiz Agent** | Generates comprehension questions for practice |
-
-## Francophone Regions
-
-Explore content from around the French-speaking world:
-
-| Region | Flag | Description |
-|--------|------|-------------|
-| France | 🇫🇷 | Metropolitan French cinema |
-| Belgium | 🇧🇪 | Belgian French films |
-| Canada (Quebec) | 🇨🇦 | Quebecois cinema |
-| Switzerland | 🇨🇭 | Swiss French content |
-| Senegal | 🇸🇳 | West African Francophone cinema |
-| Morocco | 🇲🇦 | North African French films |
-| Tunisia | 🇹🇳 | Tunisian French cinema |
-| Ivory Coast | 🇨🇮 | Ivorian French content |
+---
 
 ## Tech Stack
 
-- **Frontend**: Next.js 14 (App Router), React 18, TypeScript
-- **Styling**: Tailwind CSS with custom purple/gray theme
-- **AI**: Google Gemini 1.5 Flash (generative AI for language tutoring)
-- **Movie Data**: TMDB API (The Movie Database)
-- **Video**: YouTube embedded player (trailers with captions)
-- **Hosting**: Vercel (auto-deploys from GitHub)
+- **Frontend**: Next.js 14, React 18, TypeScript, Tailwind CSS
+- **AI**: Google Gemini 1.5 Flash
+- **Database**: Supabase (PostgreSQL)
+- **APIs**: TMDB (movies), YouTube (trailers)
+- **Speech**: Web Speech API
+- **Hosting**: Vercel
+
+---
 
 ## Deployment
 
-### Vercel (Recommended - FREE)
+### Vercel (Recommended)
 
-The easiest way to deploy:
-
-1. Push your code to GitHub
-2. Go to [vercel.com](https://vercel.com)
-3. Import your GitHub repository
-4. Add environment variables in Vercel dashboard:
+1. Push to GitHub
+2. Import repo at [vercel.com](https://vercel.com)
+3. Add environment variables:
    - `NEXT_PUBLIC_TMDB_API_KEY`
    - `GEMINI_API_KEY`
-5. Deploy! Auto-redeploys on every push to main.
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+4. Deploy!
 
-### Manual Deploy
+---
 
-```bash
-npm install -g vercel
-vercel
-# Follow prompts, add env vars when asked
-```
+## Sponsor Integrations
 
-## API Endpoints
+| Sponsor | Integration |
+|---------|-------------|
+| **TV5 Monde** | French content from 8 Francophone regions |
+| **Google AI** | Gemini powers vocabulary, quizzes, chatbot |
+| **YouTube** | Trailer player with French captions |
+| **Supabase** | Cloud database for user progress |
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/movies?type=french` | GET | Get popular French movies |
-| `/api/movies?region=CA` | GET | Get movies by region (FR, CA, BE, etc.) |
-| `/api/trailer?movieId=123` | GET | Get YouTube trailer for a movie |
-| `/api/learn` | POST | Generate AI learning content |
-
-### Example: Generate Learning Content
-
-```bash
-curl -X POST http://localhost:3000/api/learn \
-  -H "Content-Type: application/json" \
-  -d '{
-    "action": "movie-content",
-    "title": "Amélie",
-    "overview": "Amelie is a story about a girl..."
-  }'
-```
-
-## Screenshots
-
-### Movie Discovery
-Browse popular French movies from different regions with poster grid and ratings.
-
-### AI Language Tutor
-Click any movie to see AI-generated vocabulary, phrases, and cultural context.
-
-### YouTube Trailer Player
-Watch trailers with French captions enabled for listening practice.
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+---
 
 ## License
 
 MIT License - Built for Agentics TV5 Hackathon 2025
 
-## Acknowledgments
-
-- **TV5 Monde** - Inspiration for Francophone content discovery
-- **Google AI** - Gemini API for intelligent language tutoring
-- **TMDB** - Free movie database API
-- **YouTube** - Trailer embedding with captions
-- **Vercel** - Free hosting platform
-
 ---
 
-**Made with love for the Agentics TV5 Hackathon 2025**
+**Made with ❤️ for the Agentics TV5 Hackathon 2025**
 
-Learn French. Watch Movies. Immerse Yourself.
+*Learn French. Watch Movies. Compete. Level Up!*

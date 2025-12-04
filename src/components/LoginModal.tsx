@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { loginUser } from '@/lib/userStore';
+import { loginUser, loginUserSync } from '@/lib/userStore';
 
 interface LoginModalProps {
   onLogin: (user: any) => void;
@@ -13,7 +13,7 @@ export default function LoginModal({ onLogin, onClose }: LoginModalProps) {
   const [name, setName] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -27,7 +27,8 @@ export default function LoginModal({ onLogin, onClose }: LoginModalProps) {
       return;
     }
 
-    const user = loginUser(email, name);
+    // Get immediate local user, Supabase syncs in background
+    const user = loginUserSync(email, name);
     onLogin(user);
   };
 

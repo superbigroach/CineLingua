@@ -1,5 +1,7 @@
-// User Store - LocalStorage based (upgrade to Supabase for production)
-// Manages users, XP, streaks, leaderboards, and friend invites
+// User Store - Supabase + LocalStorage hybrid
+// Uses Supabase for cloud storage, falls back to localStorage
+
+import { supabase, dbHelpers, getLevelTitle, DbUser } from './supabase';
 
 export interface User {
   id: string;
@@ -10,13 +12,10 @@ export interface User {
   level: number;
   streak: number;
   lastActiveDate: string;
-  wordsLearned: string[];
-  moviesWatched: string[];
+  wordsLearned: number;
+  moviesWatched: number;
   quizzesTaken: number;
-  quizzesCorrect: number;
   createdAt: string;
-  friends: string[]; // user IDs
-  pendingInvites: string[]; // emails
 }
 
 export interface LeaderboardEntry {
@@ -42,15 +41,15 @@ export const XP_REWARDS = {
 // Level thresholds
 export const LEVELS = [
   { level: 1, xpRequired: 0, title: 'Débutant' },
-  { level: 2, xpRequired: 100, title: 'Apprenti' },
-  { level: 3, xpRequired: 300, title: 'Étudiant' },
+  { level: 2, xpRequired: 100, title: 'Novice' },
+  { level: 3, xpRequired: 300, title: 'Apprenti' },
   { level: 4, xpRequired: 600, title: 'Intermédiaire' },
   { level: 5, xpRequired: 1000, title: 'Avancé' },
   { level: 6, xpRequired: 1500, title: 'Expert' },
-  { level: 7, xpRequired: 2500, title: 'Maître' },
-  { level: 8, xpRequired: 4000, title: 'Virtuose' },
-  { level: 9, xpRequired: 6000, title: 'Polyglotte' },
-  { level: 10, xpRequired: 10000, title: 'Francophile' },
+  { level: 7, xpRequired: 2100, title: 'Maître' },
+  { level: 8, xpRequired: 2800, title: 'Grand Maître' },
+  { level: 9, xpRequired: 3600, title: 'Virtuose' },
+  { level: 10, xpRequired: 5000, title: 'Francophile' },
 ];
 
 // Generate avatar from name
@@ -86,234 +85,298 @@ export function getLevelFromXP(xp: number): { level: number; title: string; prog
   };
 }
 
-// Storage keys
-const USERS_KEY = 'cinelingua_users';
+// Storage keys for local cache
 const CURRENT_USER_KEY = 'cinelingua_current_user';
-const DEMO_LEADERBOARD_KEY = 'cinelingua_demo_leaderboard';
+const USER_CACHE_KEY = 'cinelingua_user_cache';
 
-// Initialize demo leaderboard with fake users
-function initDemoLeaderboard(): LeaderboardEntry[] {
-  const demoUsers: LeaderboardEntry[] = [
-    { id: 'demo1', name: 'Marie Claire', avatar: generateAvatar('Marie'), xp: 4520, level: 8, streak: 45 },
-    { id: 'demo2', name: 'Jean-Pierre', avatar: generateAvatar('Jean'), xp: 3200, level: 7, streak: 30 },
-    { id: 'demo3', name: 'Sophie Martin', avatar: generateAvatar('Sophie'), xp: 2800, level: 6, streak: 22 },
-    { id: 'demo4', name: 'Lucas Dubois', avatar: generateAvatar('Lucas'), xp: 2100, level: 5, streak: 18 },
-    { id: 'demo5', name: 'Emma Bernard', avatar: generateAvatar('Emma'), xp: 1650, level: 5, streak: 14 },
-    { id: 'demo6', name: 'Hugo Petit', avatar: generateAvatar('Hugo'), xp: 1200, level: 4, streak: 10 },
-    { id: 'demo7', name: 'Léa Moreau', avatar: generateAvatar('Léa'), xp: 850, level: 3, streak: 7 },
-    { id: 'demo8', name: 'Thomas Garcia', avatar: generateAvatar('Thomas'), xp: 500, level: 2, streak: 5 },
-  ];
+// Convert DB user to app user
+function dbUserToUser(dbUser: DbUser): User {
+  return {
+    id: dbUser.id,
+    email: dbUser.email,
+    name: dbUser.name,
+    avatar: generateAvatar(dbUser.name),
+    xp: dbUser.xp,
+    level: dbUser.level,
+    streak: dbUser.streak,
+    lastActiveDate: dbUser.last_active,
+    wordsLearned: dbUser.words_learned,
+    moviesWatched: dbUser.movies_watched,
+    quizzesTaken: dbUser.quizzes_completed,
+    createdAt: dbUser.created_at,
+  };
+}
 
+// Cache user locally
+function cacheUser(user: User): void {
   if (typeof window !== 'undefined') {
-    localStorage.setItem(DEMO_LEADERBOARD_KEY, JSON.stringify(demoUsers));
+    localStorage.setItem(USER_CACHE_KEY, JSON.stringify(user));
+    localStorage.setItem(CURRENT_USER_KEY, user.id);
   }
-  return demoUsers;
 }
 
-// Get all users
-export function getUsers(): User[] {
-  if (typeof window === 'undefined') return [];
-  const data = localStorage.getItem(USERS_KEY);
-  return data ? JSON.parse(data) : [];
-}
-
-// Save users
-function saveUsers(users: User[]): void {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
-}
-
-// Get current user
-export function getCurrentUser(): User | null {
+// Get cached user
+function getCachedUser(): User | null {
   if (typeof window === 'undefined') return null;
-  const userId = localStorage.getItem(CURRENT_USER_KEY);
-  if (!userId) return null;
-  const users = getUsers();
-  return users.find(u => u.id === userId) || null;
+  const cached = localStorage.getItem(USER_CACHE_KEY);
+  return cached ? JSON.parse(cached) : null;
+}
+
+// Get current user (from cache first, then Supabase)
+export function getCurrentUser(): User | null {
+  return getCachedUser();
+}
+
+// Get current user async (refreshes from Supabase)
+export async function getCurrentUserAsync(): Promise<User | null> {
+  const cached = getCachedUser();
+  if (!cached) return null;
+
+  try {
+    const dbUser = await dbHelpers.getUser(cached.email);
+    if (dbUser) {
+      const user = dbUserToUser(dbUser);
+      cacheUser(user);
+      return user;
+    }
+  } catch (error) {
+    console.error('Error fetching user:', error);
+  }
+
+  return cached;
 }
 
 // Create or login user
-export function loginUser(email: string, name: string): User {
-  const users = getUsers();
-  let user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+export async function loginUser(email: string, name: string): Promise<User> {
+  try {
+    // Try to get existing user from Supabase
+    let dbUser = await dbHelpers.getUser(email);
 
-  if (!user) {
-    // Create new user
-    user = {
-      id: `user_${Date.now()}`,
-      email: email.toLowerCase(),
-      name,
-      avatar: generateAvatar(name),
-      xp: 0,
-      level: 1,
-      streak: 0,
-      lastActiveDate: new Date().toISOString().split('T')[0],
-      wordsLearned: [],
-      moviesWatched: [],
-      quizzesTaken: 0,
-      quizzesCorrect: 0,
-      createdAt: new Date().toISOString(),
-      friends: [],
-      pendingInvites: [],
-    };
-    users.push(user);
-    saveUsers(users);
+    if (!dbUser) {
+      // Create new user in Supabase
+      dbUser = await dbHelpers.createUser(email, name);
+
+      // Check if they were invited
+      const invite = await dbHelpers.checkInvite(email);
+      if (invite) {
+        await dbHelpers.acceptInvite(invite.id, invite.inviter_id);
+      }
+    }
+
+    if (dbUser) {
+      // Update last active
+      await supabase
+        .from('users')
+        .update({ last_active: new Date().toISOString() })
+        .eq('id', dbUser.id);
+
+      const user = dbUserToUser(dbUser);
+      cacheUser(user);
+      return user;
+    }
+  } catch (error) {
+    console.error('Supabase login error:', error);
   }
 
-  // Set current user
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(CURRENT_USER_KEY, user.id);
-  }
+  // Fallback to local-only user
+  const localUser: User = {
+    id: `local_${Date.now()}`,
+    email: email.toLowerCase(),
+    name,
+    avatar: generateAvatar(name),
+    xp: 0,
+    level: 1,
+    streak: 0,
+    lastActiveDate: new Date().toISOString(),
+    wordsLearned: 0,
+    moviesWatched: 0,
+    quizzesTaken: 0,
+    createdAt: new Date().toISOString(),
+  };
+  cacheUser(localUser);
+  return localUser;
+}
 
-  // Check/update streak
-  updateStreak(user.id);
+// Sync login (returns cached or creates new)
+export function loginUserSync(email: string, name: string): User {
+  // Start async login in background
+  loginUser(email, name);
 
-  return user;
+  // Return local user immediately
+  const localUser: User = {
+    id: `local_${Date.now()}`,
+    email: email.toLowerCase(),
+    name,
+    avatar: generateAvatar(name),
+    xp: 0,
+    level: 1,
+    streak: 0,
+    lastActiveDate: new Date().toISOString(),
+    wordsLearned: 0,
+    moviesWatched: 0,
+    quizzesTaken: 0,
+    createdAt: new Date().toISOString(),
+  };
+  cacheUser(localUser);
+  return localUser;
 }
 
 // Logout user
 export function logoutUser(): void {
   if (typeof window !== 'undefined') {
     localStorage.removeItem(CURRENT_USER_KEY);
+    localStorage.removeItem(USER_CACHE_KEY);
   }
-}
-
-// Update streak
-function updateStreak(userId: string): void {
-  const users = getUsers();
-  const user = users.find(u => u.id === userId);
-  if (!user) return;
-
-  const today = new Date().toISOString().split('T')[0];
-  const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-
-  if (user.lastActiveDate === today) {
-    // Already active today
-    return;
-  } else if (user.lastActiveDate === yesterday) {
-    // Continue streak
-    user.streak += 1;
-    user.xp += XP_REWARDS.DAILY_STREAK;
-    user.level = getLevelFromXP(user.xp).level;
-  } else {
-    // Streak broken
-    user.streak = 1;
-  }
-
-  user.lastActiveDate = today;
-  saveUsers(users);
 }
 
 // Add XP to user
-export function addXP(userId: string, amount: number, reason: string): { newXP: number; leveledUp: boolean; newLevel?: number } {
-  const users = getUsers();
-  const user = users.find(u => u.id === userId);
-  if (!user) return { newXP: 0, leveledUp: false };
+export async function addXP(userId: string, amount: number, reason: string): Promise<{ newXP: number; leveledUp: boolean; newLevel?: number }> {
+  const cached = getCachedUser();
+  if (!cached || cached.id !== userId) return { newXP: 0, leveledUp: false };
 
-  const oldLevel = user.level;
-  user.xp += amount;
-  const levelInfo = getLevelFromXP(user.xp);
-  user.level = levelInfo.level;
+  const oldLevel = cached.level;
+  cached.xp += amount;
+  const levelInfo = getLevelFromXP(cached.xp);
+  cached.level = levelInfo.level;
+  cacheUser(cached);
 
-  saveUsers(users);
+  // Update in Supabase (non-blocking)
+  if (!userId.startsWith('local_')) {
+    dbHelpers.addXp(userId, amount).catch(console.error);
+  }
 
   return {
-    newXP: user.xp,
+    newXP: cached.xp,
     leveledUp: levelInfo.level > oldLevel,
     newLevel: levelInfo.level > oldLevel ? levelInfo.level : undefined,
   };
 }
 
 // Record movie watched
-export function recordMovieWatched(userId: string, movieId: string): void {
-  const users = getUsers();
-  const user = users.find(u => u.id === userId);
-  if (!user) return;
+export async function recordMovieWatched(userId: string, movieId: string): Promise<void> {
+  const cached = getCachedUser();
+  if (!cached || cached.id !== userId) return;
 
-  if (!user.moviesWatched.includes(movieId)) {
-    user.moviesWatched.push(movieId);
-    addXP(userId, XP_REWARDS.WATCH_TRAILER, 'Watched trailer');
+  cached.moviesWatched += 1;
+  await addXP(userId, XP_REWARDS.WATCH_TRAILER, 'Watched trailer');
+  cacheUser(cached);
+
+  // Update in Supabase
+  if (!userId.startsWith('local_')) {
+    supabase.rpc('increment_movies', { user_id: userId }).catch(console.error);
   }
-
-  saveUsers(users);
 }
 
 // Record word learned
-export function recordWordLearned(userId: string, word: string): void {
-  const users = getUsers();
-  const user = users.find(u => u.id === userId);
-  if (!user) return;
+export async function recordWordLearned(
+  userId: string,
+  french: string,
+  english: string,
+  movieId?: number,
+  movieTitle?: string
+): Promise<void> {
+  const cached = getCachedUser();
+  if (!cached || cached.id !== userId) return;
 
-  if (!user.wordsLearned.includes(word.toLowerCase())) {
-    user.wordsLearned.push(word.toLowerCase());
-    addXP(userId, XP_REWARDS.LEARN_WORD, 'Learned word');
+  cached.wordsLearned += 1;
+  await addXP(userId, XP_REWARDS.LEARN_WORD, 'Learned word');
+  cacheUser(cached);
+
+  // Save to Supabase
+  if (!userId.startsWith('local_')) {
+    dbHelpers.addLearnedWord(userId, french, english, movieId, movieTitle).catch(console.error);
   }
-
-  saveUsers(users);
 }
 
 // Record quiz result
-export function recordQuizResult(userId: string, correct: number, total: number): { xpEarned: number; perfect: boolean } {
-  const users = getUsers();
-  const user = users.find(u => u.id === userId);
-  if (!user) return { xpEarned: 0, perfect: false };
+export async function recordQuizResult(
+  userId: string,
+  correct: number,
+  total: number,
+  movieId?: number,
+  movieTitle?: string
+): Promise<{ xpEarned: number; perfect: boolean }> {
+  const cached = getCachedUser();
+  if (!cached || cached.id !== userId) return { xpEarned: 0, perfect: false };
 
-  user.quizzesTaken += 1;
-  user.quizzesCorrect += correct;
-
+  cached.quizzesTaken += 1;
   const perfect = correct === total;
   const xpEarned = perfect ? XP_REWARDS.QUIZ_PERFECT : XP_REWARDS.COMPLETE_QUIZ;
-  addXP(userId, xpEarned, perfect ? 'Perfect quiz!' : 'Quiz completed');
+  await addXP(userId, xpEarned, perfect ? 'Perfect quiz!' : 'Quiz completed');
+  cacheUser(cached);
 
-  saveUsers(users);
+  // Save to Supabase
+  if (!userId.startsWith('local_') && movieId && movieTitle) {
+    dbHelpers.recordQuizResult(userId, movieId, movieTitle, correct, total, xpEarned).catch(console.error);
+  }
 
   return { xpEarned, perfect };
 }
 
 // Send friend invite
-export function sendFriendInvite(userId: string, friendEmail: string): boolean {
-  const users = getUsers();
-  const user = users.find(u => u.id === userId);
-  if (!user) return false;
+export async function sendFriendInvite(userId: string, friendEmail: string): Promise<boolean> {
+  await addXP(userId, XP_REWARDS.INVITE_FRIEND, 'Invited friend');
 
-  if (!user.pendingInvites.includes(friendEmail.toLowerCase())) {
-    user.pendingInvites.push(friendEmail.toLowerCase());
-    addXP(userId, XP_REWARDS.INVITE_FRIEND, 'Invited friend');
-    saveUsers(users);
+  // Save to Supabase
+  if (!userId.startsWith('local_')) {
+    await dbHelpers.sendInvite(userId, friendEmail);
   }
 
   return true;
 }
 
-// Get leaderboard
-export function getLeaderboard(period: 'all' | 'monthly' | 'weekly' | 'daily' = 'all'): LeaderboardEntry[] {
-  // Get demo leaderboard
-  let demoUsers: LeaderboardEntry[] = [];
-  if (typeof window !== 'undefined') {
-    const stored = localStorage.getItem(DEMO_LEADERBOARD_KEY);
-    demoUsers = stored ? JSON.parse(stored) : initDemoLeaderboard();
+// Get leaderboard from Supabase
+export async function getLeaderboard(period: 'all' | 'monthly' | 'weekly' | 'daily' = 'all'): Promise<LeaderboardEntry[]> {
+  try {
+    const periodMap = {
+      all: 'all-time' as const,
+      monthly: 'monthly' as const,
+      weekly: 'weekly' as const,
+      daily: 'daily' as const,
+    };
+
+    const dbUsers = await dbHelpers.getLeaderboard(periodMap[period], 20);
+
+    return dbUsers.map(u => ({
+      id: u.id,
+      name: u.name,
+      avatar: generateAvatar(u.name),
+      xp: u.xp,
+      level: u.level,
+      streak: u.streak,
+    }));
+  } catch (error) {
+    console.error('Error fetching leaderboard:', error);
+    // Return demo data on error
+    return getDemoLeaderboard(period);
   }
+}
 
-  // Get real users
-  const users = getUsers();
-  const realUserEntries: LeaderboardEntry[] = users.map(u => ({
-    id: u.id,
-    name: u.name,
-    avatar: u.avatar,
-    xp: u.xp,
-    level: u.level,
-    streak: u.streak,
-  }));
+// Fallback demo leaderboard
+function getDemoLeaderboard(period: string): LeaderboardEntry[] {
+  const demoUsers: LeaderboardEntry[] = [
+    { id: 'demo1', name: 'Marie Dupont', avatar: generateAvatar('Marie'), xp: 4250, level: 8, streak: 15 },
+    { id: 'demo2', name: 'Pierre Martin', avatar: generateAvatar('Pierre'), xp: 3890, level: 7, streak: 12 },
+    { id: 'demo3', name: 'Sophie Laurent', avatar: generateAvatar('Sophie'), xp: 3420, level: 7, streak: 8 },
+    { id: 'demo4', name: 'Jean-Luc Bernard', avatar: generateAvatar('Jean'), xp: 2980, level: 6, streak: 22 },
+    { id: 'demo5', name: 'Claire Moreau', avatar: generateAvatar('Claire'), xp: 2650, level: 6, streak: 5 },
+    { id: 'demo6', name: 'Antoine Petit', avatar: generateAvatar('Antoine'), xp: 2340, level: 5, streak: 9 },
+    { id: 'demo7', name: 'Emma Richard', avatar: generateAvatar('Emma'), xp: 1890, level: 5, streak: 3 },
+    { id: 'demo8', name: 'Lucas Thomas', avatar: generateAvatar('Lucas'), xp: 1560, level: 4, streak: 7 },
+  ];
 
-  // Combine and sort
-  const combined = [...demoUsers, ...realUserEntries];
-
-  // For demo purposes, adjust XP based on period
-  // In real app, you'd track daily/weekly/monthly XP separately
   const multiplier = period === 'daily' ? 0.05 : period === 'weekly' ? 0.2 : period === 'monthly' ? 0.5 : 1;
+  return demoUsers.map(u => ({ ...u, xp: Math.floor(u.xp * multiplier) }));
+}
 
-  return combined
-    .map(u => ({ ...u, xp: Math.floor(u.xp * multiplier) }))
-    .sort((a, b) => b.xp - a.xp)
-    .slice(0, 20);
+// Get user's quiz history
+export async function getUserQuizHistory(userId: string) {
+  if (userId.startsWith('local_')) return [];
+  return await dbHelpers.getUserQuizResults(userId);
+}
+
+// Get user's learned words
+export async function getUserWords(userId: string) {
+  if (userId.startsWith('local_')) return [];
+  return await dbHelpers.getUserWords(userId);
 }
