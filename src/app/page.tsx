@@ -248,9 +248,9 @@ export default function Home() {
     setShowQuiz(false);
   }
 
-  function handleWordLearned(word: string) {
-    if (user) {
-      recordWordLearned(user.id, word);
+  function handleWordLearned(word: string, translation: string) {
+    if (user && selectedMovie) {
+      recordWordLearned(user.id, word, translation, selectedMovie.id, selectedMovie.title);
       refreshUser();
     }
   }

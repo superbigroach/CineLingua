@@ -13,7 +13,7 @@ interface FlashcardModalProps {
   movieTitle: string;
   language?: string;
   speechCode?: string;
-  onWordLearned: (word: string) => void;
+  onWordLearned: (word: string, translation: string) => void;
   onClose: () => void;
 }
 
@@ -42,7 +42,7 @@ export default function FlashcardModal({ vocabulary, movieTitle, language = 'Fre
     if (direction === 'right') {
       // Known
       setKnownWords(prev => [...prev, word]);
-      onWordLearned(word);
+      onWordLearned(word, currentCard.translation);
     } else {
       // Still learning
       setLearningWords(prev => [...prev, word]);
