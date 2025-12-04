@@ -19,7 +19,6 @@ function SparkleCanvas() {
 
     const sparkles: { x: number; y: number; size: number; speedX: number; speedY: number; opacity: number }[] = [];
 
-    // Create sparkles
     for (let i = 0; i < 100; i++) {
       sparkles.push({
         x: Math.random() * canvas.width,
@@ -39,13 +38,11 @@ function SparkleCanvas() {
         sparkle.x += sparkle.speedX;
         sparkle.y += sparkle.speedY;
 
-        // Wrap around edges
         if (sparkle.x < 0) sparkle.x = canvas.width;
         if (sparkle.x > canvas.width) sparkle.x = 0;
         if (sparkle.y < 0) sparkle.y = canvas.height;
         if (sparkle.y > canvas.height) sparkle.y = 0;
 
-        // Twinkle effect
         sparkle.opacity = 0.2 + Math.abs(Math.sin(Date.now() * 0.001 + sparkle.x)) * 0.5;
 
         ctx.beginPath();
@@ -142,10 +139,10 @@ export default function Home() {
       <SparkleCanvas />
 
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 py-5 bg-[rgba(5,5,8,0.85)] backdrop-blur-xl border-b border-[rgba(6,182,212,0.1)]">
-        <div className="max-w-7xl mx-auto px-6 flex items-center justify-center relative">
+      <nav className="fixed top-0 left-0 right-0 z-50 py-4 bg-[rgba(5,5,8,0.9)] backdrop-blur-xl border-b border-[rgba(6,182,212,0.1)]">
+        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           {/* Logo */}
-          <a href="#" className="absolute left-6 flex items-center gap-3">
+          <a href="#" className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-white font-bold text-lg">
               CL
             </div>
@@ -156,96 +153,85 @@ export default function Home() {
           </a>
 
           {/* Nav Links */}
-          <ul className="flex gap-8 list-none">
-            <li><a href="#regions" className="text-sm font-medium text-white/70 hover:text-white transition-colors relative py-2 hover:after:w-full after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-cyan-400 after:to-blue-500 after:transition-all">Regions</a></li>
-            <li><a href="#movies" className="text-sm font-medium text-white/70 hover:text-white transition-colors relative py-2 hover:after:w-full after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-cyan-400 after:to-blue-500 after:transition-all">Movies</a></li>
-            <li><a href="#learn" className="text-sm font-medium text-white/70 hover:text-white transition-colors relative py-2 hover:after:w-full after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-cyan-400 after:to-blue-500 after:transition-all">Learn</a></li>
-            <li><a href="#how-it-works" className="text-sm font-medium text-white/70 hover:text-white transition-colors relative py-2 hover:after:w-full after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-cyan-400 after:to-blue-500 after:transition-all">How It Works</a></li>
+          <ul className="hidden md:flex gap-8 list-none">
+            <li><a href="#regions" className="text-sm font-medium text-white/70 hover:text-white transition-colors">Regions</a></li>
+            <li><a href="#movies" className="text-sm font-medium text-white/70 hover:text-white transition-colors">Movies</a></li>
+            <li><a href="#how-it-works" className="text-sm font-medium text-white/70 hover:text-white transition-colors">How It Works</a></li>
           </ul>
 
           {/* Sponsor Badges */}
-          <div className="absolute right-6 flex items-center gap-3">
-            <span className="px-3 py-1.5 text-xs font-medium rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/30">TV5 Monde</span>
-            <span className="px-3 py-1.5 text-xs font-medium rounded-lg bg-green-500/20 text-green-400 border border-green-500/30">Google AI</span>
+          <div className="flex items-center gap-2">
+            <span className="px-2 py-1 text-xs font-medium rounded bg-blue-500/20 text-blue-400 border border-blue-500/30">TV5</span>
+            <span className="px-2 py-1 text-xs font-medium rounded bg-green-500/20 text-green-400 border border-green-500/30">Gemini</span>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="min-h-screen flex items-center justify-center pt-20 pb-16 px-6">
-        <div className="text-center max-w-4xl">
-          {/* Animated Logo */}
-          <div className="relative w-36 h-36 mx-auto mb-10">
-            <div className="absolute inset-[-50px] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.15)_0%,transparent_70%)] animate-pulse" />
-            <div className="relative w-full h-full rounded-full flex items-center justify-center animate-[float_4s_ease-in-out_infinite]">
-              <span className="text-6xl">🎬</span>
+      <section className="min-h-[80vh] flex items-center justify-center pt-24 pb-12 px-6">
+        <div className="text-center max-w-3xl">
+          {/* Icon */}
+          <div className="relative w-28 h-28 mx-auto mb-8">
+            <div className="absolute inset-[-30px] rounded-full bg-[radial-gradient(circle,rgba(6,182,212,0.2)_0%,transparent_70%)] animate-pulse" />
+            <div className="relative w-full h-full rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/30">
+              <i className="fas fa-film text-white text-4xl"></i>
             </div>
           </div>
 
-          <span className="block text-lg text-purple-400 mb-2">Welcome to</span>
-          <h1 className="text-5xl md:text-7xl font-extrabold mb-6">
-            <span className="bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">Cine</span>
+          <p className="text-purple-400 mb-2 text-sm uppercase tracking-wider">Welcome to</p>
+          <h1 className="text-4xl md:text-6xl font-extrabold mb-4">
+            <span className="text-white">Cine</span>
             <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Lingua</span>
           </h1>
-          <p className="text-xl text-white/70 max-w-2xl mx-auto mb-8 leading-relaxed">
-            Learn French through cinema. Discover popular movies from Francophone regions worldwide
-            and master the language with AI-powered tutoring.
+          <p className="text-lg text-white/60 max-w-xl mx-auto mb-8">
+            Learn French through cinema. Discover movies from Francophone regions and master the language with AI tutoring.
           </p>
 
-          <div className="flex gap-4 justify-center flex-wrap mb-12">
-            <a href="#movies" className="btn btn-primary inline-flex items-center gap-2">
-              <i className="fas fa-film" />
+          <div className="flex gap-4 justify-center flex-wrap">
+            <a href="#movies" className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-xl text-white font-semibold hover:shadow-lg hover:shadow-cyan-500/30 transition-all hover:-translate-y-0.5">
+              <i className="fas fa-play mr-2"></i>
               Explore Movies
             </a>
-            <a href="#how-it-works" className="btn btn-secondary inline-flex items-center gap-2">
-              <i className="fas fa-question-circle" />
+            <a href="#how-it-works" className="px-6 py-3 bg-white/5 border border-white/20 rounded-xl text-white font-semibold hover:bg-white/10 transition-all">
+              <i className="fas fa-info-circle mr-2"></i>
               How It Works
             </a>
-          </div>
-
-          {/* Scroll Indicator */}
-          <div className="animate-bounce text-white/50 flex flex-col items-center gap-2">
-            <div className="w-6 h-10 border-2 border-white/30 rounded-xl relative">
-              <div className="w-1 h-2 bg-white/50 rounded-full absolute top-2 left-1/2 -translate-x-1/2 animate-[scroll_2s_ease-in-out_infinite]" />
-            </div>
-            <span className="text-xs">Scroll Down</span>
           </div>
         </div>
       </section>
 
       <div className="max-w-7xl mx-auto px-6 pb-20">
         {/* Region Selector Section */}
-        <section id="regions" className="mb-16">
-          <h2 className="section-title">
-            <span className="title-number">01.</span>
+        <section id="regions" className="mb-12">
+          <h2 className="text-xl font-bold mb-6 flex items-center gap-3">
+            <span className="text-purple-400 text-sm">01.</span>
             <span>Explore Francophone Regions</span>
           </h2>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-9 gap-3">
             <button
               onClick={() => setSelectedRegion('')}
-              className={`glass-card p-4 text-center transition-all hover:scale-105 ${
+              className={`p-3 rounded-xl text-center transition-all hover:scale-105 border ${
                 selectedRegion === ''
-                  ? 'border-cyan-500/50 bg-cyan-500/10 shadow-[0_0_30px_rgba(6,182,212,0.2)]'
-                  : ''
+                  ? 'border-cyan-500/50 bg-cyan-500/20'
+                  : 'border-white/10 bg-white/5 hover:bg-white/10'
               }`}
             >
-              <span className="text-3xl block mb-2">🇫🇷</span>
-              <span className="text-sm font-medium">All French</span>
+              <span className="block text-xs font-bold text-cyan-400">FR</span>
+              <span className="block text-[10px] text-white/60 mt-1">All French</span>
             </button>
-            {FRANCOPHONE_REGIONS.map((region, index) => (
+            {FRANCOPHONE_REGIONS.map((region) => (
               <button
                 key={region.code}
                 onClick={() => setSelectedRegion(region.code)}
-                className={`glass-card p-4 text-center transition-all hover:scale-105 float-animation ${
+                className={`p-3 rounded-xl text-center transition-all hover:scale-105 border ${
                   selectedRegion === region.code
-                    ? 'border-cyan-500/50 bg-cyan-500/10 shadow-[0_0_30px_rgba(6,182,212,0.2)]'
-                    : ''
+                    ? 'border-cyan-500/50 bg-cyan-500/20'
+                    : 'border-white/10 bg-white/5 hover:bg-white/10'
                 }`}
-                style={{ animationDelay: `${-index * 0.5}s` }}
               >
-                <span className="text-3xl block mb-2">{region.flag}</span>
-                <span className="text-sm font-medium">{region.name}</span>
+                <span className="block text-xs font-bold text-white">{region.code}</span>
+                <span className="block text-[10px] text-white/60 mt-1 truncate">{region.name}</span>
               </button>
             ))}
           </div>
@@ -253,18 +239,18 @@ export default function Home() {
 
         {/* Trailer Player Section */}
         {selectedMovie && (
-          <section id="player" className="mb-16">
-            <div className="glass-card p-8 overflow-hidden">
-              <div className="flex items-center gap-3 mb-6">
-                <span className="text-2xl">🎬</span>
-                <h2 className="text-2xl font-bold">{selectedMovie.title}</h2>
+          <section id="player" className="mb-12">
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
+              <div className="flex items-center gap-3 mb-4">
+                <i className="fas fa-film text-cyan-400"></i>
+                <h2 className="text-xl font-bold">{selectedMovie.title}</h2>
                 {selectedMovie.original_title !== selectedMovie.title && (
-                  <span className="text-white/50 text-lg">({selectedMovie.original_title})</span>
+                  <span className="text-white/50 text-sm">({selectedMovie.original_title})</span>
                 )}
               </div>
 
               {trailerKey ? (
-                <div className="aspect-video rounded-xl overflow-hidden bg-black border border-white/10">
+                <div className="aspect-video rounded-xl overflow-hidden bg-black">
                   <iframe
                     width="100%"
                     height="100%"
@@ -277,38 +263,36 @@ export default function Home() {
                   />
                 </div>
               ) : (
-                <div className="aspect-video bg-[rgba(0,0,0,0.4)] rounded-xl flex items-center justify-center border border-white/10">
+                <div className="aspect-video bg-black/50 rounded-xl flex items-center justify-center">
                   <div className="text-center text-white/50">
-                    <p className="text-5xl mb-3">🎥</p>
-                    <p className="text-lg">No trailer available</p>
+                    <i className="fas fa-video-slash text-4xl mb-2"></i>
+                    <p>No trailer available</p>
                   </div>
                 </div>
               )}
 
-              <p className="text-white/70 mt-6 leading-relaxed">{selectedMovie.overview}</p>
+              <p className="text-white/60 mt-4 text-sm">{selectedMovie.overview}</p>
 
-              <div className="mt-6 p-5 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 rounded-xl border border-cyan-500/20">
-                <p className="text-cyan-300 flex items-start gap-3">
-                  <span className="text-xl">💡</span>
-                  <span>
-                    <strong className="block mb-1">Learning Tip:</strong>
-                    Watch the trailer first, then review the vocabulary below. Try to listen for the words you&apos;ve learned!
-                  </span>
+              <div className="mt-4 p-4 bg-cyan-500/10 rounded-xl border border-cyan-500/20">
+                <p className="text-cyan-300 text-sm">
+                  <i className="fas fa-lightbulb mr-2"></i>
+                  <strong>Tip:</strong> Watch the trailer, then review vocabulary in the AI Tutor panel!
                 </p>
               </div>
             </div>
           </section>
         )}
 
+        {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Movie Grid */}
           <div className="lg:col-span-2" id="movies">
-            <h2 className="section-title">
-              <span className="title-number">02.</span>
+            <h2 className="text-xl font-bold mb-6 flex items-center gap-3">
+              <span className="text-purple-400 text-sm">02.</span>
               <span>
                 Popular Movies
                 {selectedRegion && (
-                  <span className="text-cyan-400 ml-2">
+                  <span className="text-cyan-400 ml-2 text-base font-normal">
                     in {FRANCOPHONE_REGIONS.find(r => r.code === selectedRegion)?.name}
                   </span>
                 )}
@@ -316,45 +300,43 @@ export default function Home() {
             </h2>
 
             {loading ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {[...Array(6)].map((_, i) => (
-                  <div key={i} className="glass-card h-80 animate-pulse" />
+                  <div key={i} className="bg-white/5 rounded-xl h-72 animate-pulse" />
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
-                {movies.slice(0, 12).map((movie, index) => (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                {movies.slice(0, 12).map((movie) => (
                   <div
                     key={movie.id}
                     onClick={() => loadLearningContent(movie)}
-                    className={`glass-card overflow-hidden cursor-pointer transition-all hover:scale-105 hover:border-purple-500/50 hover:shadow-[0_0_40px_rgba(168,85,247,0.2)] float-animation ${
-                      selectedMovie?.id === movie.id ? 'border-cyan-500/50 shadow-[0_0_40px_rgba(6,182,212,0.3)]' : ''
+                    className={`bg-white/5 rounded-xl overflow-hidden cursor-pointer transition-all hover:scale-[1.02] hover:bg-white/10 border ${
+                      selectedMovie?.id === movie.id
+                        ? 'border-cyan-500/50 ring-2 ring-cyan-500/30'
+                        : 'border-white/10 hover:border-white/20'
                     }`}
-                    style={{ animationDelay: `${-index * 0.3}s` }}
                   >
-                    <div className="relative aspect-[2/3] overflow-hidden">
+                    <div className="aspect-[2/3] overflow-hidden">
                       <img
                         src={getImageUrl(movie.poster_path, 'w342')}
                         alt={movie.title}
-                        className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                        className="w-full h-full object-cover transition-transform hover:scale-105"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity flex items-end p-4">
-                        <span className="text-sm font-medium text-white">Click to learn</span>
-                      </div>
                     </div>
-                    <div className="p-4">
-                      <h3 className="text-white font-semibold text-sm truncate mb-1">
+                    <div className="p-3">
+                      <h3 className="text-white font-medium text-sm truncate">
                         {movie.title}
                       </h3>
-                      <p className="text-white/50 text-xs truncate mb-3">
+                      <p className="text-white/40 text-xs truncate">
                         {movie.original_title !== movie.title && movie.original_title}
                       </p>
-                      <div className="flex items-center justify-between">
-                        <span className="text-amber-400 text-sm flex items-center gap-1">
-                          <i className="fas fa-star text-xs" />
+                      <div className="flex items-center justify-between mt-2">
+                        <span className="text-amber-400 text-xs">
+                          <i className="fas fa-star mr-1"></i>
                           {movie.vote_average.toFixed(1)}
                         </span>
-                        <span className="text-white/40 text-xs">
+                        <span className="text-white/30 text-xs">
                           {movie.release_date?.split('-')[0]}
                         </span>
                       </div>
@@ -366,67 +348,64 @@ export default function Home() {
           </div>
 
           {/* Learning Panel */}
-          <div className="lg:col-span-1" id="learn">
-            <div className="glass-card p-6 sticky top-24">
-              <h2 className="text-xl font-bold mb-6 flex items-center gap-3">
-                <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center">
-                  <i className="fas fa-robot text-white" />
-                </span>
+          <div className="lg:col-span-1">
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 border border-white/10 lg:sticky lg:top-24">
+              <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center">
+                  <i className="fas fa-robot text-white text-sm"></i>
+                </div>
                 <span>AI Language Tutor</span>
-                <span className="text-xs px-2 py-1 rounded-lg bg-green-500/20 text-green-400 border border-green-500/30 ml-auto">
+                <span className="text-[10px] px-2 py-0.5 rounded bg-green-500/20 text-green-400 border border-green-500/30 ml-auto">
                   Gemini
                 </span>
               </h2>
 
               {!selectedMovie ? (
-                <div className="text-center py-16 text-white/50">
-                  <p className="text-5xl mb-4">👈</p>
-                  <p className="text-lg">Select a movie to start learning!</p>
+                <div className="text-center py-12 text-white/40">
+                  <i className="fas fa-hand-point-left text-4xl mb-3"></i>
+                  <p>Select a movie to start learning!</p>
                 </div>
               ) : loadingContent ? (
-                <div className="text-center py-16">
-                  <div className="w-12 h-12 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin mx-auto mb-4" />
-                  <p className="text-white/50">Generating learning content...</p>
+                <div className="text-center py-12">
+                  <div className="w-10 h-10 border-3 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin mx-auto mb-3"></div>
+                  <p className="text-white/40 text-sm">Generating content...</p>
                 </div>
               ) : learningContent ? (
-                <div className="space-y-6">
-                  {/* Selected Movie Mini Card */}
-                  <div className="flex gap-4 p-4 bg-black/30 rounded-xl border border-white/5">
+                <div className="space-y-5 max-h-[60vh] overflow-y-auto pr-2">
+                  {/* Selected Movie */}
+                  <div className="flex gap-3 p-3 bg-black/30 rounded-xl">
                     <img
                       src={getImageUrl(selectedMovie.poster_path, 'w92')}
                       alt={selectedMovie.title}
-                      className="w-14 h-20 rounded-lg object-cover"
+                      className="w-12 h-16 rounded object-cover"
                     />
                     <div>
-                      <h3 className="text-white font-semibold">{selectedMovie.title}</h3>
-                      <p className="text-white/50 text-sm">{selectedMovie.original_title}</p>
+                      <h3 className="text-white font-medium text-sm">{selectedMovie.title}</h3>
+                      <p className="text-white/40 text-xs">{selectedMovie.original_title}</p>
                     </div>
                   </div>
 
                   {/* Vocabulary */}
                   {learningContent.vocabulary?.length > 0 && (
                     <div>
-                      <h3 className="text-purple-400 font-semibold mb-3 flex items-center gap-2">
-                        <i className="fas fa-book" />
+                      <h3 className="text-purple-400 font-medium mb-2 text-sm flex items-center gap-2">
+                        <i className="fas fa-book"></i>
                         Vocabulary
                       </h3>
                       <div className="space-y-2">
                         {learningContent.vocabulary.slice(0, 5).map((item: any, i: number) => (
-                          <div
-                            key={i}
-                            className="p-4 bg-black/30 rounded-xl border border-white/5 hover:border-purple-500/30 transition-all"
-                          >
-                            <div className="flex justify-between items-start mb-2">
-                              <span className="text-white font-medium">{item.word}</span>
-                              <span className={`text-xs px-2 py-1 rounded-lg ${
-                                item.difficulty === 'beginner' ? 'bg-green-500/20 text-green-400 border border-green-500/30' :
-                                item.difficulty === 'intermediate' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
-                                'bg-red-500/20 text-red-400 border border-red-500/30'
+                          <div key={i} className="p-3 bg-black/30 rounded-lg">
+                            <div className="flex justify-between items-start mb-1">
+                              <span className="text-white font-medium text-sm">{item.word}</span>
+                              <span className={`text-[10px] px-1.5 py-0.5 rounded ${
+                                item.difficulty === 'beginner' ? 'bg-green-500/20 text-green-400' :
+                                item.difficulty === 'intermediate' ? 'bg-amber-500/20 text-amber-400' :
+                                'bg-red-500/20 text-red-400'
                               }`}>
                                 {item.difficulty}
                               </span>
                             </div>
-                            <p className="text-white/60 text-sm">{item.translation}</p>
+                            <p className="text-white/50 text-xs">{item.translation}</p>
                           </div>
                         ))}
                       </div>
@@ -436,19 +415,15 @@ export default function Home() {
                   {/* Phrases */}
                   {learningContent.phrases?.length > 0 && (
                     <div>
-                      <h3 className="text-purple-400 font-semibold mb-3 flex items-center gap-2">
-                        <i className="fas fa-comment" />
+                      <h3 className="text-purple-400 font-medium mb-2 text-sm flex items-center gap-2">
+                        <i className="fas fa-comment"></i>
                         Useful Phrases
                       </h3>
                       <div className="space-y-2">
                         {learningContent.phrases.slice(0, 3).map((item: any, i: number) => (
-                          <div key={i} className="p-4 bg-black/30 rounded-xl border border-white/5">
-                            <p className="text-white italic">&ldquo;{item.phrase}&rdquo;</p>
-                            <p className="text-white/60 text-sm mt-2">{item.meaning}</p>
-                            <p className="text-white/40 text-xs mt-1 flex items-center gap-1">
-                              <i className="fas fa-thumbtack" />
-                              {item.usage}
-                            </p>
+                          <div key={i} className="p-3 bg-black/30 rounded-lg">
+                            <p className="text-white italic text-sm">&ldquo;{item.phrase}&rdquo;</p>
+                            <p className="text-white/50 text-xs mt-1">{item.meaning}</p>
                           </div>
                         ))}
                       </div>
@@ -458,30 +433,13 @@ export default function Home() {
                   {/* Cultural Context */}
                   {learningContent.culturalContext && (
                     <div>
-                      <h3 className="text-purple-400 font-semibold mb-3 flex items-center gap-2">
-                        <i className="fas fa-theater-masks" />
+                      <h3 className="text-purple-400 font-medium mb-2 text-sm flex items-center gap-2">
+                        <i className="fas fa-theater-masks"></i>
                         Cultural Context
                       </h3>
-                      <p className="text-white/70 text-sm p-4 bg-black/30 rounded-xl border border-white/5 leading-relaxed">
+                      <p className="text-white/60 text-xs p-3 bg-black/30 rounded-lg leading-relaxed">
                         {learningContent.culturalContext}
                       </p>
-                    </div>
-                  )}
-
-                  {/* Practice Questions */}
-                  {learningContent.discussionQuestions?.length > 0 && (
-                    <div>
-                      <h3 className="text-purple-400 font-semibold mb-3 flex items-center gap-2">
-                        <i className="fas fa-question-circle" />
-                        Practice Questions
-                      </h3>
-                      <div className="space-y-2">
-                        {learningContent.discussionQuestions.map((q: string, i: number) => (
-                          <div key={i} className="p-4 bg-black/30 rounded-xl border border-white/5 text-white/70 text-sm">
-                            {i + 1}. {q}
-                          </div>
-                        ))}
-                      </div>
                     </div>
                   )}
                 </div>
@@ -491,83 +449,71 @@ export default function Home() {
         </div>
 
         {/* How It Works Section */}
-        <section id="how-it-works" className="mt-20">
-          <h2 className="section-title">
-            <span className="title-number">03.</span>
+        <section id="how-it-works" className="mt-16">
+          <h2 className="text-xl font-bold mb-8 flex items-center gap-3">
+            <span className="text-purple-400 text-sm">03.</span>
             <span>How CineLingua Works</span>
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { icon: 'fa-search', title: 'Browse Movies', desc: 'Explore French films from different Francophone regions', color: 'cyan' },
-              { icon: 'fa-play', title: 'Watch Trailer', desc: 'Preview the movie and hear authentic French dialogue', color: 'purple' },
-              { icon: 'fa-graduation-cap', title: 'Learn Vocabulary', desc: 'AI generates key words and phrases from the movie', color: 'pink' },
-              { icon: 'fa-check-circle', title: 'Watch & Understand', desc: 'Enjoy the full movie with better comprehension!', color: 'green' },
+              { icon: 'fa-search', title: 'Browse', desc: 'Explore French films from Francophone regions', color: 'from-cyan-400 to-blue-500' },
+              { icon: 'fa-play', title: 'Watch', desc: 'Preview trailers with French dialogue', color: 'from-purple-400 to-pink-500' },
+              { icon: 'fa-graduation-cap', title: 'Learn', desc: 'AI generates vocabulary & phrases', color: 'from-pink-400 to-rose-500' },
+              { icon: 'fa-check-circle', title: 'Understand', desc: 'Enjoy movies with comprehension!', color: 'from-green-400 to-emerald-500' },
             ].map((step, index) => (
-              <div
-                key={index}
-                className="glass-card p-8 text-center float-animation"
-                style={{ animationDelay: `${-index * 0.5}s` }}
-              >
-                <div className={`w-16 h-16 rounded-2xl mx-auto mb-6 flex items-center justify-center text-2xl text-white ${
-                  step.color === 'cyan' ? 'bg-gradient-to-br from-cyan-400 to-blue-500' :
-                  step.color === 'purple' ? 'bg-gradient-to-br from-purple-400 to-pink-500' :
-                  step.color === 'pink' ? 'bg-gradient-to-br from-pink-400 to-rose-500' :
-                  'bg-gradient-to-br from-green-400 to-emerald-500'
-                }`}>
-                  <i className={`fas ${step.icon}`} />
+              <div key={index} className="bg-white/5 rounded-xl p-5 text-center border border-white/10 hover:bg-white/10 transition-all">
+                <div className={`w-12 h-12 rounded-xl mx-auto mb-3 flex items-center justify-center text-white bg-gradient-to-br ${step.color}`}>
+                  <i className={`fas ${step.icon}`}></i>
                 </div>
-                <div className="text-4xl font-bold text-white/10 mb-3">{index + 1}</div>
-                <h3 className="text-lg font-bold text-white mb-3">{step.title}</h3>
-                <p className="text-white/60 text-sm leading-relaxed">{step.desc}</p>
+                <div className="text-3xl font-bold text-white/10 mb-1">{index + 1}</div>
+                <h3 className="text-white font-semibold mb-1">{step.title}</h3>
+                <p className="text-white/50 text-xs">{step.desc}</p>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Sponsor Integration Section */}
-        <section className="mt-20">
-          <h2 className="section-title">
-            <span className="title-number">04.</span>
+        {/* Powered By */}
+        <section className="mt-16">
+          <h2 className="text-xl font-bold mb-8 flex items-center gap-3">
+            <span className="text-purple-400 text-sm">04.</span>
             <span>Powered By</span>
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="glass-card p-8 text-center float-animation">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 mx-auto mb-4 flex items-center justify-center">
-                <span className="text-3xl">📺</span>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="bg-white/5 rounded-xl p-5 text-center border border-white/10">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 mx-auto mb-3 flex items-center justify-center">
+                <i className="fas fa-tv text-white"></i>
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">TV5 Monde</h3>
-              <p className="text-white/60 text-sm">French content from 8 Francophone regions worldwide</p>
+              <h3 className="text-white font-semibold text-sm mb-1">TV5 Monde</h3>
+              <p className="text-white/50 text-xs">French content from 8 Francophone regions</p>
             </div>
 
-            <div className="glass-card p-8 text-center float-animation" style={{ animationDelay: '-1s' }}>
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-400 to-emerald-500 mx-auto mb-4 flex items-center justify-center">
-                <span className="text-3xl">🤖</span>
+            <div className="bg-white/5 rounded-xl p-5 text-center border border-white/10">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-400 to-emerald-500 mx-auto mb-3 flex items-center justify-center">
+                <i className="fas fa-robot text-white"></i>
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">Google AI</h3>
-              <p className="text-white/60 text-sm">Gemini-powered language tutoring with vocabulary, phrases & cultural context</p>
+              <h3 className="text-white font-semibold text-sm mb-1">Google AI</h3>
+              <p className="text-white/50 text-xs">Gemini-powered language tutoring</p>
             </div>
 
-            <div className="glass-card p-8 text-center float-animation" style={{ animationDelay: '-2s' }}>
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-400 to-red-600 mx-auto mb-4 flex items-center justify-center">
-                <span className="text-3xl">▶️</span>
+            <div className="bg-white/5 rounded-xl p-5 text-center border border-white/10">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-400 to-red-600 mx-auto mb-3 flex items-center justify-center">
+                <i className="fab fa-youtube text-white"></i>
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">YouTube</h3>
-              <p className="text-white/60 text-sm">Embedded trailer player with French closed captions</p>
+              <h3 className="text-white font-semibold text-sm mb-1">YouTube</h3>
+              <p className="text-white/50 text-xs">Trailers with French captions</p>
             </div>
           </div>
         </section>
       </div>
 
       {/* Footer */}
-      <footer className="border-t border-white/10 bg-black/30 py-8">
+      <footer className="border-t border-white/10 bg-black/30 py-6">
         <div className="max-w-7xl mx-auto px-6 text-center">
-          <p className="text-white/50 text-sm mb-2">Built for Agentics TV5 Hackathon 2025</p>
-          <p className="text-white/30 text-xs">
-            Integrating TV5 Monde Content • Google AI (Gemini) • YouTube Trailers
-          </p>
-          <p className="text-purple-400 text-sm mt-4 font-medium">
+          <p className="text-white/40 text-sm mb-1">Built for Agentics TV5 Hackathon 2025</p>
+          <p className="text-purple-400 text-sm font-medium">
             Learn French. Watch Movies. Immerse Yourself.
           </p>
         </div>
