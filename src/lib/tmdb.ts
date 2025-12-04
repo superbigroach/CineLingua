@@ -97,3 +97,23 @@ export function getImageUrl(path: string | null, size = 'w500'): string {
   if (!path) return '/placeholder-movie.png';
   return `https://image.tmdb.org/t/p/${size}${path}`;
 }
+
+// Get movie videos (trailers from YouTube)
+export async function getMovieVideos(movieId: number) {
+  const res = await fetch(
+    `${TMDB_BASE_URL}/movie/${movieId}/videos?api_key=${TMDB_API_KEY}`
+  );
+  const data = await res.json();
+
+  // Find YouTube trailer (prefer French, fallback to any)
+  const videos = data.results || [];
+  const frenchTrailer = videos.find(
+    (v: any) => v.site === 'YouTube' && v.type === 'Trailer' && v.iso_639_1 === 'fr'
+  );
+  const anyTrailer = videos.find(
+    (v: any) => v.site === 'YouTube' && v.type === 'Trailer'
+  );
+  const anyVideo = videos.find((v: any) => v.site === 'YouTube');
+
+  return frenchTrailer || anyTrailer || anyVideo || null;
+}

@@ -8,6 +8,7 @@ export default function Home() {
   const [selectedRegion, setSelectedRegion] = useState<string>('');
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [learningContent, setLearningContent] = useState<any>(null);
+  const [trailerKey, setTrailerKey] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingContent, setLoadingContent] = useState(false);
 
@@ -38,20 +39,32 @@ export default function Home() {
   async function loadLearningContent(movie: Movie) {
     setSelectedMovie(movie);
     setLoadingContent(true);
+    setTrailerKey(null);
+
     try {
-      const res = await fetch('/api/learn', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'movie-content',
-          title: movie.original_title || movie.title,
-          overview: movie.overview,
+      // Fetch learning content and trailer in parallel
+      const [contentRes, trailerRes] = await Promise.all([
+        fetch('/api/learn', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'movie-content',
+            title: movie.original_title || movie.title,
+            overview: movie.overview,
+          }),
         }),
-      });
-      const data = await res.json();
-      setLearningContent(data);
+        fetch(`/api/trailer?movieId=${movie.id}`),
+      ]);
+
+      const contentData = await contentRes.json();
+      setLearningContent(contentData);
+
+      if (trailerRes.ok) {
+        const trailerData = await trailerRes.json();
+        setTrailerKey(trailerData.key);
+      }
     } catch (error) {
-      console.error('Failed to load learning content:', error);
+      console.error('Failed to load content:', error);
     } finally {
       setLoadingContent(false);
     }
@@ -76,7 +89,7 @@ export default function Home() {
               <span>Powered by</span>
               <span className="px-2 py-1 bg-blue-500/20 rounded">TV5 Monde</span>
               <span className="px-2 py-1 bg-green-500/20 rounded">Google AI</span>
-              <span className="px-2 py-1 bg-orange-500/20 rounded">Kaltura</span>
+              <span className="px-2 py-1 bg-red-500/20 rounded">YouTube</span>
             </div>
           </div>
         </div>
@@ -114,6 +127,51 @@ export default function Home() {
             ))}
           </div>
         </section>
+
+        {/* Trailer Player Section */}
+        {selectedMovie && (
+          <section className="mb-8 bg-gray-800/50 rounded-xl p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <h2 className="text-lg font-semibold text-white">
+                🎬 {selectedMovie.title}
+              </h2>
+              {selectedMovie.original_title !== selectedMovie.title && (
+                <span className="text-gray-400 text-sm">({selectedMovie.original_title})</span>
+              )}
+            </div>
+
+            {trailerKey ? (
+              <div className="aspect-video rounded-lg overflow-hidden bg-black">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  src={`https://www.youtube.com/embed/${trailerKey}?rel=0&cc_load_policy=1&cc_lang_pref=fr`}
+                  title={`${selectedMovie.title} Trailer`}
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="w-full h-full"
+                />
+              </div>
+            ) : (
+              <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center">
+                <div className="text-center text-gray-500">
+                  <p className="text-4xl mb-2">🎥</p>
+                  <p>No trailer available</p>
+                </div>
+              </div>
+            )}
+
+            <p className="text-gray-400 text-sm mt-4">{selectedMovie.overview}</p>
+
+            <div className="mt-4 p-4 bg-purple-500/10 rounded-lg border border-purple-500/30">
+              <p className="text-purple-300 text-sm">
+                💡 <strong>Learning Tip:</strong> Watch the trailer first, then review the vocabulary below.
+                Try to listen for the words you&apos;ve learned!
+              </p>
+            </div>
+          </section>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Movie Grid */}
@@ -273,20 +331,29 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Kaltura Section - Video Player Placeholder */}
+        {/* How It Works Section */}
         <section className="mt-12 bg-gray-800/50 rounded-xl p-8">
-          <div className="flex items-center gap-2 mb-4">
-            <h2 className="text-lg font-semibold text-white">📺 Video Learning (Kaltura Integration)</h2>
-            <span className="text-xs bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded">Coming Soon</span>
-          </div>
-          <p className="text-gray-400 mb-4">
-            Interactive video player with dual subtitles, clickable vocabulary, and learning checkpoints.
-          </p>
-          <div className="bg-gray-900 rounded-lg aspect-video flex items-center justify-center">
-            <div className="text-center text-gray-500">
-              <p className="text-6xl mb-4">🎬</p>
-              <p>Kaltura Player Integration</p>
-              <p className="text-sm">Watch French content with interactive learning features</p>
+          <h2 className="text-lg font-semibold text-white mb-6">🎓 How CineLingua Works</h2>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="text-center">
+              <div className="text-4xl mb-3">1️⃣</div>
+              <h3 className="text-white font-medium mb-2">Browse Movies</h3>
+              <p className="text-gray-400 text-sm">Explore French films from different Francophone regions</p>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl mb-3">2️⃣</div>
+              <h3 className="text-white font-medium mb-2">Watch Trailer</h3>
+              <p className="text-gray-400 text-sm">Preview the movie and hear authentic French dialogue</p>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl mb-3">3️⃣</div>
+              <h3 className="text-white font-medium mb-2">Learn Vocabulary</h3>
+              <p className="text-gray-400 text-sm">AI generates key words and phrases from the movie</p>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl mb-3">4️⃣</div>
+              <h3 className="text-white font-medium mb-2">Watch & Understand</h3>
+              <p className="text-gray-400 text-sm">Enjoy the full movie with better comprehension!</p>
             </div>
           </div>
         </section>
@@ -297,7 +364,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 py-6 text-center text-gray-500 text-sm">
           <p>Built for Agentics TV5 Hackathon 2025</p>
           <p className="mt-1">
-            Integrating TV5 Monde • Google AI (Gemini) • Kaltura
+            Integrating TV5 Monde Content • Google AI (Gemini) • YouTube Trailers
           </p>
         </div>
       </footer>
