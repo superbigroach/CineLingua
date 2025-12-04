@@ -18,6 +18,7 @@ export async function GET(request: NextRequest) {
         name: video.name,
         type: video.type,
         language: video.iso_639_1,
+        isFrench: video.isFrench || video.iso_639_1 === 'fr',
       });
     }
 

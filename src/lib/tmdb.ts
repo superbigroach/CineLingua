@@ -98,22 +98,58 @@ export function getImageUrl(path: string | null, size = 'w500'): string {
   return `https://image.tmdb.org/t/p/${size}${path}`;
 }
 
-// Get movie videos (trailers from YouTube)
+// Get movie videos (trailers from YouTube) - PRIORITIZE FRENCH
 export async function getMovieVideos(movieId: number) {
-  const res = await fetch(
+  // First try to get French videos specifically
+  const frRes = await fetch(
+    `${TMDB_BASE_URL}/movie/${movieId}/videos?api_key=${TMDB_API_KEY}&language=fr-FR`
+  );
+  const frData = await frRes.json();
+  const frVideos = frData.results || [];
+
+  // Then get all videos as fallback
+  const allRes = await fetch(
     `${TMDB_BASE_URL}/movie/${movieId}/videos?api_key=${TMDB_API_KEY}`
   );
-  const data = await res.json();
+  const allData = await allRes.json();
+  const allVideos = allData.results || [];
 
-  // Find YouTube trailer (prefer French, fallback to any)
-  const videos = data.results || [];
-  const frenchTrailer = videos.find(
+  // Combine and dedupe
+  const allVideoIds = new Set(allVideos.map((v: any) => v.id));
+  const combinedVideos = [...frVideos, ...allVideos.filter((v: any) => !frVideos.some((fv: any) => fv.id === v.id))];
+
+  // Priority order for finding the best video:
+  // 1. French trailer
+  // 2. French teaser
+  // 3. French clip
+  // 4. Any French video
+  // 5. Original language trailer (for French movies)
+  // 6. Any trailer
+  // 7. Any video
+
+  const frenchTrailer = combinedVideos.find(
     (v: any) => v.site === 'YouTube' && v.type === 'Trailer' && v.iso_639_1 === 'fr'
   );
-  const anyTrailer = videos.find(
+  const frenchTeaser = combinedVideos.find(
+    (v: any) => v.site === 'YouTube' && v.type === 'Teaser' && v.iso_639_1 === 'fr'
+  );
+  const frenchClip = combinedVideos.find(
+    (v: any) => v.site === 'YouTube' && v.type === 'Clip' && v.iso_639_1 === 'fr'
+  );
+  const anyFrenchVideo = combinedVideos.find(
+    (v: any) => v.site === 'YouTube' && v.iso_639_1 === 'fr'
+  );
+  const anyTrailer = combinedVideos.find(
     (v: any) => v.site === 'YouTube' && v.type === 'Trailer'
   );
-  const anyVideo = videos.find((v: any) => v.site === 'YouTube');
+  const anyVideo = combinedVideos.find((v: any) => v.site === 'YouTube');
 
-  return frenchTrailer || anyTrailer || anyVideo || null;
+  const selected = frenchTrailer || frenchTeaser || frenchClip || anyFrenchVideo || anyTrailer || anyVideo || null;
+
+  // Add flag to indicate if it's French
+  if (selected) {
+    selected.isFrench = selected.iso_639_1 === 'fr';
+  }
+
+  return selected;
 }
