@@ -15,8 +15,12 @@ export default function LeaderboardModal({ onClose }: LeaderboardModalProps) {
   const [currentUser, setCurrentUser] = useState<any>(null);
 
   useEffect(() => {
-    setLeaderboard(getLeaderboard(period));
-    setCurrentUser(getCurrentUser());
+    async function loadData() {
+      const data = await getLeaderboard(period);
+      setLeaderboard(data);
+      setCurrentUser(getCurrentUser());
+    }
+    loadData();
   }, [period]);
 
   const periods: { key: Period; label: string }[] = [
