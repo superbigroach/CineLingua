@@ -297,7 +297,7 @@ export default function Home() {
       <nav className="fixed top-0 left-0 right-0 z-50 py-3 bg-[rgba(5,5,8,0.95)] backdrop-blur-xl border-b border-[rgba(6,182,212,0.1)]">
         <div className="max-w-[1800px] mx-auto px-4 flex items-center justify-between">
           {/* Logo */}
-          <a href="#" className="flex items-center gap-2">
+          <a href="/" className="flex items-center gap-2">
             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-white font-bold">
               CL
             </div>
@@ -306,6 +306,16 @@ export default function Home() {
               <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Lingua</span>
             </span>
           </a>
+
+          {/* Nav Links */}
+          <div className="hidden md:flex items-center gap-4 ml-6">
+            <a href="/contest" className="text-white/60 hover:text-white text-sm transition-colors">
+              <i className="fas fa-trophy mr-1.5 text-yellow-400"></i>Contest
+            </a>
+            <a href="/wallet" className="text-white/60 hover:text-white text-sm transition-colors">
+              <i className="fas fa-wallet mr-1.5 text-purple-400"></i>Wallet
+            </a>
+          </div>
 
           {/* User Section */}
           <div className="flex items-center gap-3">
@@ -538,13 +548,13 @@ export default function Home() {
                       <i className="fas fa-layer-group mr-2"></i>Flashcards
                     </button>
                     <button
-                      onClick={() => setShowChatbot(true)}
+                      onClick={() => user ? setShowChatbot(true) : setShowLoginModal(true)}
                       className="flex-1 px-4 py-2.5 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl text-sm font-semibold hover:shadow-lg transition-all"
                     >
                       <i className="fas fa-robot mr-2"></i>Ask AI
                     </button>
                     <button
-                      onClick={() => setShowSceneCreator(true)}
+                      onClick={() => user ? setShowSceneCreator(true) : setShowLoginModal(true)}
                       disabled={!learningContent}
                       className="flex-1 px-4 py-2.5 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl text-sm font-semibold hover:shadow-lg transition-all disabled:opacity-50"
                     >
@@ -702,7 +712,7 @@ export default function Home() {
                     {/* Quick Actions */}
                     <div className="pt-2 border-t border-white/10 grid grid-cols-4 gap-2">
                       <button
-                        onClick={loadQuiz}
+                        onClick={() => user ? loadQuiz() : setShowLoginModal(true)}
                         disabled={loadingQuiz}
                         className="p-2 bg-purple-500/10 rounded-lg text-purple-400 hover:bg-purple-500/20 transition-all text-center"
                       >
@@ -710,21 +720,21 @@ export default function Home() {
                         <span className="text-[10px]">Quiz</span>
                       </button>
                       <button
-                        onClick={() => setShowFlashcards(true)}
+                        onClick={() => user ? setShowFlashcards(true) : setShowLoginModal(true)}
                         className="p-2 bg-cyan-500/10 rounded-lg text-cyan-400 hover:bg-cyan-500/20 transition-all text-center"
                       >
                         <i className="fas fa-layer-group text-sm block mb-1"></i>
                         <span className="text-[10px]">Cards</span>
                       </button>
                       <button
-                        onClick={() => setShowChatbot(true)}
+                        onClick={() => user ? setShowChatbot(true) : setShowLoginModal(true)}
                         className="p-2 bg-green-500/10 rounded-lg text-green-400 hover:bg-green-500/20 transition-all text-center"
                       >
                         <i className="fas fa-robot text-sm block mb-1"></i>
                         <span className="text-[10px]">Chat</span>
                       </button>
                       <button
-                        onClick={() => setShowSceneCreator(true)}
+                        onClick={() => user ? setShowSceneCreator(true) : setShowLoginModal(true)}
                         className="p-2 bg-orange-500/10 rounded-lg text-orange-400 hover:bg-orange-500/20 transition-all text-center"
                       >
                         <i className="fas fa-film text-sm block mb-1"></i>
