@@ -31,6 +31,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(data);
   } catch (error) {
     console.error('TMDB API error:', error);
-    return NextResponse.json({ error: 'Failed to fetch movies' }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({
+      error: 'Failed to fetch movies',
+      details: errorMessage,
+      hasTmdbKey: !!process.env.NEXT_PUBLIC_TMDB_API_KEY
+    }, { status: 500 });
   }
 }
