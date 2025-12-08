@@ -5,12 +5,12 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
 export async function POST(request: NextRequest) {
   try {
-    const { message, movieTitle, movieOverview, language = 'French', history } = await request.json();
+    const { message, movieTitle, movieOverview, language = 'French', history = [] } = await request.json();
 
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     // Build conversation context
-    const historyContext = history
+    const historyContext = (history || [])
       .map((m: any) => `${m.role === 'user' ? 'User' : 'Tutor'}: ${m.content}`)
       .join('\n');
 
@@ -41,8 +41,13 @@ Respond naturally as a ${language} tutor:`;
     return NextResponse.json({ response });
   } catch (error) {
     console.error('Chat API error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: 'Failed to process chat message' },
+      {
+        error: 'Failed to process chat message',
+        details: errorMessage,
+        hasApiKey: !!process.env.GEMINI_API_KEY
+      },
       { status: 500 }
     );
   }
