@@ -330,7 +330,7 @@ export async function generateStyleVariations(
   original: string;
   variations: { styleId: string; prompt: string }[];
 }> {
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
   // Generate 3 different style interpretations
   const variations: { styleId: string; prompt: string }[] = [];
@@ -363,7 +363,7 @@ export async function getRecommendedStyles(
   prompt: string,
   language: string
 ): Promise<StylePreset[]> {
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
   const analysisPrompt = `Analyze this scene prompt and recommend the 3 best visual styles from the list.
 

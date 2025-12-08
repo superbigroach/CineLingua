@@ -64,7 +64,7 @@ export async function generateMovieIngredients(
   theme: MovieSceneTheme;
   quiz: SceneQuizQuestion[];
 }> {
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
   const prompt = `You are creating a language learning game that connects movie vocabulary to creative scene-making.
 
@@ -217,7 +217,7 @@ export async function enhanceScenePrompt(
   variations: string[];
   dialogue: string;
 }> {
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
   const prompt = `You are a cinematographer enhancing a user's scene idea for AI video generation.
 

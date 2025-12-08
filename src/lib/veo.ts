@@ -114,7 +114,7 @@ const STYLE_PRESETS = {
 export async function enhancePromptForVeo(
   scenePrompt: ScenePrompt
 ): Promise<EnhancedPrompt> {
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
   const style = STYLE_PRESETS[scenePrompt.style || 'drama'];
 
   const prompt = `You are a world-class cinematographer and screenwriter creating prompts for AI video generation.
@@ -340,7 +340,7 @@ export async function judgeSubmission(
     videoDescription: string;
   }
 ): Promise<JudgeScore[]> {
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
   const scores: JudgeScore[] = [];
 
   for (const [judgeId, judge] of Object.entries(JUDGE_PERSONAS)) {
