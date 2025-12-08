@@ -17,7 +17,7 @@ export async function explainWord(
   examples: string[];
   culturalNote?: string;
 }> {
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
   const prompt = `You are a ${targetLanguage} language tutor. Explain this word/phrase to an English speaker learning ${targetLanguage}.
 
@@ -61,7 +61,7 @@ export async function generateMovieLearningContent(
   culturalContext: string;
   discussionQuestions: string[];
 }> {
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
   const prompt = `You are a language learning content creator. Based on this ${targetLanguage} movie, create learning materials for English speakers.
 
@@ -111,7 +111,7 @@ export async function generateQuiz(
     explanation: string;
   }>;
 }> {
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
   const prompt = `Create a ${difficulty} level ${targetLanguage} language quiz based on this content:
 
@@ -152,7 +152,7 @@ export async function recommendMoviesForLearning(
     learningBenefit: string;
   }>;
 }> {
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
   const prompt = `You are a ${targetLanguage} language learning advisor. Recommend movies for a ${currentLevel} learner interested in: ${interests.join(', ')}.
 

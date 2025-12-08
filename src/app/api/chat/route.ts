@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
   try {
     const { message, movieTitle, movieOverview, language = 'French', history = [] } = await request.json();
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     // Build conversation context
     const historyContext = (history || [])
