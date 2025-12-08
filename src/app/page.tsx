@@ -386,90 +386,104 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero Section - Minimal */}
-      <section className="pt-16 pb-4 px-4">
-        <div className="max-w-[1800px] mx-auto">
-          {/* Language selector - horizontal pill style */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
-            {LEARNING_LANGUAGES.map((lang) => (
-              <button
-                key={lang.code}
-                onClick={() => {
-                  setSelectedLanguage(lang);
-                  setSelectedRegion('');
-                }}
-                className={`flex-shrink-0 h-9 px-4 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
-                  selectedLanguage.code === lang.code
-                    ? 'bg-white text-black'
-                    : 'bg-white/[0.04] text-white/60 hover:bg-white/[0.08] hover:text-white'
-                }`}
-              >
-                <span className="text-base">{lang.flag}</span>
-                <span>{lang.name}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Main Content Area */}
-      <div className="max-w-[1800px] mx-auto px-4 pb-20">
-
-        {/* Region Selector - Shows regions for selected language */}
-        {selectedLanguage.regions.length > 1 && (
-          <section id="regions" className="mb-6">
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => setSelectedRegion('')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
-                  selectedRegion === ''
-                    ? 'border-cyan-500/50 bg-cyan-500/20 text-cyan-400'
-                    : 'border-white/10 bg-white/5 hover:bg-white/10 text-white/70'
-                }`}
-              >
-                <span>All {selectedLanguage.name}</span>
-              </button>
-              {selectedLanguage.regions.map((region) => (
+      {/* Language Bar - Fixed below nav */}
+      <div className="pt-14">
+        <div className="sticky top-14 z-40 bg-[#08080c]/95 backdrop-blur-xl border-b border-white/[0.04]">
+          <div className="max-w-[1800px] mx-auto px-4 py-3">
+            {/* Language pills - centered grid on mobile, scroll on larger */}
+            <div className="flex items-center justify-center gap-2 flex-wrap sm:flex-nowrap sm:justify-start sm:overflow-x-auto scrollbar-hide">
+              {LEARNING_LANGUAGES.map((lang, index) => (
                 <button
-                  key={region.code}
-                  onClick={() => setSelectedRegion(region.code)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
-                    selectedRegion === region.code
-                      ? 'border-cyan-500/50 bg-cyan-500/20 text-cyan-400'
-                      : 'border-white/10 bg-white/5 hover:bg-white/10 text-white/70'
+                  key={lang.code}
+                  onClick={() => {
+                    setSelectedLanguage(lang);
+                    setSelectedRegion('');
+                  }}
+                  className={`flex-shrink-0 h-8 px-3.5 rounded-lg text-[13px] font-medium transition-all duration-200 flex items-center gap-2 btn-press ${
+                    selectedLanguage.code === lang.code
+                      ? 'bg-white text-black shadow-lg shadow-white/10'
+                      : 'bg-white/[0.03] text-white/50 hover:bg-white/[0.06] hover:text-white/80 border border-white/[0.04]'
                   }`}
+                  style={{ animationDelay: `${index * 30}ms` }}
                 >
-                  {region.flag} {region.name}
+                  <span className="text-sm">{lang.flag}</span>
+                  <span>{lang.name}</span>
                 </button>
               ))}
             </div>
-          </section>
-        )}
+
+            {/* Region sub-selector */}
+            {selectedLanguage.regions.length > 1 && (
+              <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-white/[0.04] overflow-x-auto scrollbar-hide">
+                <span className="text-[11px] text-white/30 uppercase tracking-wider mr-2 flex-shrink-0">Region</span>
+                <button
+                  onClick={() => setSelectedRegion('')}
+                  className={`flex-shrink-0 h-7 px-3 rounded-md text-[12px] font-medium transition-all duration-200 btn-press ${
+                    selectedRegion === ''
+                      ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
+                      : 'text-white/40 hover:text-white/70 hover:bg-white/[0.04]'
+                  }`}
+                >
+                  All
+                </button>
+                {selectedLanguage.regions.map((region) => (
+                  <button
+                    key={region.code}
+                    onClick={() => setSelectedRegion(region.code)}
+                    className={`flex-shrink-0 h-7 px-3 rounded-md text-[12px] font-medium transition-all duration-200 btn-press ${
+                      selectedRegion === region.code
+                        ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
+                        : 'text-white/40 hover:text-white/70 hover:bg-white/[0.04]'
+                    }`}
+                  >
+                    {region.flag} {region.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="max-w-[1800px] mx-auto px-4 py-6 pb-20">
 
         {/* Trailer Player Section */}
         {selectedMovie && (
-          <section id="player" className="mb-6">
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
-              <div className="flex items-center justify-between mb-3">
+          <section id="player" className="mb-8 animate-slide-up">
+            <div className="bg-[#0a0a10] rounded-2xl border border-white/[0.06] overflow-hidden">
+              {/* Header */}
+              <div className="px-5 py-4 border-b border-white/[0.04] flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <i className="fas fa-film text-cyan-400"></i>
-                  <h2 className="text-lg font-bold">{selectedMovie.title}</h2>
+                  <div className="w-9 h-9 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 className="text-base font-semibold text-white">{selectedMovie.title}</h2>
+                    <p className="text-[11px] text-white/40">{selectedMovie.release_date?.split('-')[0]} • {selectedLanguage.name}</p>
+                  </div>
                 </div>
                 <button
                   onClick={() => setSelectedMovie(null)}
-                  className="text-white/40 hover:text-white"
+                  className="w-8 h-8 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] flex items-center justify-center transition-all btn-press"
                 >
-                  <i className="fas fa-times"></i>
+                  <svg className="w-4 h-4 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Content */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                {/* Video Player */}
                 {trailerKey ? (
                   <div className="aspect-video rounded-xl overflow-hidden bg-black">
                     <iframe
                       width="100%"
                       height="100%"
-                      src={`https://www.youtube.com/embed/${trailerKey}?rel=0&cc_load_policy=1&cc_lang_pref=fr`}
+                      src={`https://www.youtube.com/embed/${trailerKey}?rel=0&cc_load_policy=1&cc_lang_pref=${selectedLanguage.code}`}
                       title={`${selectedMovie.title} Trailer`}
                       frameBorder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -478,69 +492,91 @@ export default function Home() {
                     />
                   </div>
                 ) : (
-                  <div className="aspect-video bg-black/50 rounded-xl flex items-center justify-center">
-                    <div className="text-center text-white/50">
-                      <i className="fas fa-video-slash text-3xl mb-2"></i>
-                      <p className="text-sm">No trailer available</p>
+                  <div className="aspect-video bg-black/30 rounded-xl flex items-center justify-center border border-white/[0.04]">
+                    <div className="text-center">
+                      <svg className="w-10 h-10 text-white/20 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                      <p className="text-white/30 text-sm">No trailer available</p>
                     </div>
                   </div>
                 )}
 
-                {/* Side-by-Side Translation */}
-                <div className="space-y-3">
+                {/* Info Panel */}
+                <div className="space-y-4">
+                  {/* Title translations */}
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="p-3 bg-blue-500/10 rounded-xl border border-blue-500/20">
-                      <p className="text-[10px] text-blue-400 mb-1 flex items-center gap-1">
+                    <div className="p-3.5 bg-white/[0.02] rounded-xl border border-white/[0.04]">
+                      <p className="text-[10px] text-cyan-400/80 mb-1.5 flex items-center gap-1.5 uppercase tracking-wider font-medium">
                         <span>{selectedLanguage.flag}</span> {selectedLanguage.nativeName}
                       </p>
-                      <p className="text-white/80 text-xs leading-relaxed">
+                      <p className="text-white text-sm font-medium leading-snug">
                         {selectedMovie.original_title !== selectedMovie.title
                           ? selectedMovie.original_title
                           : selectedMovie.title}
                       </p>
                     </div>
-                    <div className="p-3 bg-purple-500/10 rounded-xl border border-purple-500/20">
-                      <p className="text-[10px] text-purple-400 mb-1 flex items-center gap-1">
+                    <div className="p-3.5 bg-white/[0.02] rounded-xl border border-white/[0.04]">
+                      <p className="text-[10px] text-purple-400/80 mb-1.5 flex items-center gap-1.5 uppercase tracking-wider font-medium">
                         <span>🇬🇧</span> English
                       </p>
-                      <p className="text-white/80 text-xs leading-relaxed">{selectedMovie.title}</p>
+                      <p className="text-white text-sm font-medium leading-snug">{selectedMovie.title}</p>
                     </div>
                   </div>
 
-                  <p className="text-white/50 text-xs">{selectedMovie.overview}</p>
+                  {/* Overview */}
+                  <p className="text-white/50 text-[13px] leading-relaxed line-clamp-3">{selectedMovie.overview}</p>
 
                   {/* Action Buttons */}
-                  <div className="flex flex-wrap gap-2">
+                  <div className="grid grid-cols-2 gap-2">
                     <button
-                      onClick={loadQuiz}
+                      onClick={() => user ? loadQuiz() : setShowLoginModal(true)}
                       disabled={loadingQuiz || !learningContent}
-                      className="flex-1 px-4 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl text-sm font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+                      className="h-11 px-4 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] rounded-xl text-[13px] font-medium transition-all duration-200 disabled:opacity-40 btn-press flex items-center justify-center gap-2"
                     >
                       {loadingQuiz ? (
-                        <><i className="fas fa-spinner fa-spin mr-2"></i>Loading...</>
+                        <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
                       ) : (
-                        <><i className="fas fa-brain mr-2"></i>Quiz</>
+                        <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
                       )}
+                      <span>Quiz</span>
                     </button>
+
                     <button
-                      onClick={() => setShowFlashcards(true)}
+                      onClick={() => user ? setShowFlashcards(true) : setShowLoginModal(true)}
                       disabled={!learningContent?.vocabulary?.length}
-                      className="flex-1 px-4 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-xl text-sm font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+                      className="h-11 px-4 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] rounded-xl text-[13px] font-medium transition-all duration-200 disabled:opacity-40 btn-press flex items-center justify-center gap-2"
                     >
-                      <i className="fas fa-layer-group mr-2"></i>Flashcards
+                      <svg className="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                      </svg>
+                      <span>Flashcards</span>
                     </button>
+
                     <button
                       onClick={() => user ? setShowChatbot(true) : setShowLoginModal(true)}
-                      className="flex-1 px-4 py-2.5 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl text-sm font-semibold hover:shadow-lg transition-all"
+                      className="h-11 px-4 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] rounded-xl text-[13px] font-medium transition-all duration-200 btn-press flex items-center justify-center gap-2"
                     >
-                      <i className="fas fa-robot mr-2"></i>Ask AI
+                      <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                      </svg>
+                      <span>Ask AI</span>
                     </button>
+
                     <button
                       onClick={() => user ? setShowSceneCreator(true) : setShowLoginModal(true)}
                       disabled={!learningContent}
-                      className="flex-1 px-4 py-2.5 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl text-sm font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+                      className="h-11 px-4 bg-gradient-to-r from-orange-500/20 to-red-500/20 hover:from-orange-500/30 hover:to-red-500/30 border border-orange-500/30 rounded-xl text-[13px] font-medium text-orange-300 transition-all duration-200 disabled:opacity-40 btn-press flex items-center justify-center gap-2"
                     >
-                      <i className="fas fa-film mr-2"></i>Create Scene
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                      <span>Create Scene</span>
                     </button>
                   </div>
                 </div>
