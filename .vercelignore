@@ -1,0 +1,2 @@
+# Exclude Hardhat contracts from Vercel build
+contracts/
