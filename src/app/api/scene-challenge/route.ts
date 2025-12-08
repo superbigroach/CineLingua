@@ -106,8 +106,13 @@ export async function POST(request: NextRequest) {
     }
   } catch (error) {
     console.error('Scene challenge API error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: 'Internal server error' },
+      {
+        error: 'Internal server error',
+        details: errorMessage,
+        hasApiKey: !!process.env.GEMINI_API_KEY
+      },
       { status: 500 }
     );
   }
