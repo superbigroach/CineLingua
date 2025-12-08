@@ -12,6 +12,7 @@ import ChatbotModal from '@/components/ChatbotModal';
 import LeaderboardModal from '@/components/LeaderboardModal';
 import InviteFriendModal from '@/components/InviteFriendModal';
 import LoginModal from '@/components/LoginModal';
+import SceneCreatorModal from '@/components/SceneCreatorModal';
 
 // Toast Notification Component
 function Toast({ message, type = 'success', onClose }: { message: string; type?: 'success' | 'xp' | 'level'; onClose: () => void }) {
@@ -122,6 +123,7 @@ export default function Home() {
   const [showChatbot, setShowChatbot] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showInviteFriend, setShowInviteFriend] = useState(false);
+  const [showSceneCreator, setShowSceneCreator] = useState(false);
 
   // Quiz data
   const [quizQuestions, setQuizQuestions] = useState<any[]>([]);
@@ -541,6 +543,13 @@ export default function Home() {
                     >
                       <i className="fas fa-robot mr-2"></i>Ask AI
                     </button>
+                    <button
+                      onClick={() => setShowSceneCreator(true)}
+                      disabled={!learningContent}
+                      className="flex-1 px-4 py-2.5 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl text-sm font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+                    >
+                      <i className="fas fa-film mr-2"></i>Create Scene
+                    </button>
                   </div>
                 </div>
               </div>
@@ -691,7 +700,7 @@ export default function Home() {
                     )}
 
                     {/* Quick Actions */}
-                    <div className="pt-2 border-t border-white/10 grid grid-cols-3 gap-2">
+                    <div className="pt-2 border-t border-white/10 grid grid-cols-4 gap-2">
                       <button
                         onClick={loadQuiz}
                         disabled={loadingQuiz}
@@ -713,6 +722,13 @@ export default function Home() {
                       >
                         <i className="fas fa-robot text-sm block mb-1"></i>
                         <span className="text-[10px]">Chat</span>
+                      </button>
+                      <button
+                        onClick={() => setShowSceneCreator(true)}
+                        className="p-2 bg-orange-500/10 rounded-lg text-orange-400 hover:bg-orange-500/20 transition-all text-center"
+                      >
+                        <i className="fas fa-film text-sm block mb-1"></i>
+                        <span className="text-[10px]">Scene</span>
                       </button>
                     </div>
                   </div>
@@ -821,6 +837,22 @@ export default function Home() {
 
       {showInviteFriend && (
         <InviteFriendModal onClose={() => setShowInviteFriend(false)} />
+      )}
+
+      {showSceneCreator && selectedMovie && (
+        <SceneCreatorModal
+          movieTitle={selectedMovie.title}
+          movieId={selectedMovie.id}
+          movieOverview={selectedMovie.overview}
+          language={selectedLanguage.name}
+          languageCode={selectedLanguage.code}
+          onClose={() => setShowSceneCreator(false)}
+          onSceneCreated={(sceneData) => {
+            console.log('Scene created:', sceneData);
+            showToast('Scene submitted! Check the contest page.', 'success');
+            setShowSceneCreator(false);
+          }}
+        />
       )}
 
       {/* Toast */}
