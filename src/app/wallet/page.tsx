@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import NavBar from '@/components/NavBar';
+import SparkleBackground from '@/components/SparkleBackground';
 
-const GENERATION_COST = 2.40;
-const STAKE_AMOUNT = 1.60;
-const TOTAL_TO_COMPETE = GENERATION_COST + STAKE_AMOUNT;
+const GENERATION_COST = 2.40;  // 3x 8-sec clips @ $0.80 each
+const STAKE_AMOUNT = 4.80;     // 2x Veo cost
+const PLATFORM_FEE = 0.50;     // Per submission
+const TOTAL_TO_COMPETE = GENERATION_COST + STAKE_AMOUNT; // $7.20
 
 // Base Sepolia testnet config
 const BASE_SEPOLIA_CONFIG = {
@@ -184,10 +186,11 @@ export default function WalletPage() {
   const canAffordGeneration = parseFloat(usdcBalance) >= GENERATION_COST;
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-[#0a0a12] via-[#0f0f1a] to-[#0a0a12] text-white">
+    <main className="min-h-screen bg-[#08080c] text-white relative">
+      <SparkleBackground />
       <NavBar />
 
-      <div className="pt-14 max-w-3xl mx-auto px-4 py-10">
+      <div className="pt-14 max-w-3xl mx-auto px-4 py-10 relative z-10">
         {/* Header */}
         <div className="text-center mb-10">
           <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-4">
@@ -328,21 +331,25 @@ export default function WalletPage() {
 
           <div className="space-y-3 mb-4">
             <div className="flex justify-between items-center py-2 border-b border-white/10">
-              <span className="text-white/60">Video Generation (3x 8-sec clips @ $0.10/s)</span>
+              <span className="text-white/60">Video Generation (3x 8-sec clips)</span>
               <span className="font-medium">${GENERATION_COST.toFixed(2)}</span>
             </div>
             <div className="flex justify-between items-center py-2 border-b border-white/10">
-              <span className="text-white/60">Contest Stake (goes to prize pool)</span>
+              <span className="text-white/60">Contest Stake (2x Veo cost → prize pool)</span>
               <span className="font-medium">${STAKE_AMOUNT.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between items-center py-2 border-b border-white/10">
+              <span className="text-white/60">Platform Fee</span>
+              <span className="font-medium">${PLATFORM_FEE.toFixed(2)}</span>
             </div>
             <div className="flex justify-between items-center py-2">
               <span className="font-bold">Total to Compete</span>
-              <span className="text-xl font-bold text-purple-400">${TOTAL_TO_COMPETE.toFixed(2)}</span>
+              <span className="text-xl font-bold text-purple-400">${(TOTAL_TO_COMPETE + PLATFORM_FEE).toFixed(2)}</span>
             </div>
           </div>
 
           <p className="text-white/40 text-xs">
-            Platform takes 20% of prize pool from winnings. Top 3 split 80%.
+            $0.50 platform fee per submission. Stake goes to prize pool, top 3 split it.
           </p>
         </div>
 

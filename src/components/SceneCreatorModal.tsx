@@ -68,7 +68,8 @@ const MIN_INGREDIENTS_REQUIRED = 3;
 const VIDEO_CLIPS = 3;            // Number of 8-second clips to generate
 const COST_PER_CLIP = 0.80;       // $0.80 per 8-second clip
 const GENERATION_COST = VIDEO_CLIPS * COST_PER_CLIP; // $2.40 total
-const STAKE_AMOUNT = 1.60;
+const STAKE_AMOUNT = GENERATION_COST * 2; // $4.80 (2x Veo cost)
+const PLATFORM_FEE = 0.50;        // $0.50 per submission
 
 const difficultyConfig = {
   beginner: { bg: 'bg-emerald-500/20', text: 'text-emerald-400', border: 'border-emerald-500/30', label: 'Easy' },

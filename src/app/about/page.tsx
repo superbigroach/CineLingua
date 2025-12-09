@@ -2,13 +2,15 @@
 
 import Link from 'next/link';
 import NavBar from '@/components/NavBar';
+import SparkleBackground from '@/components/SparkleBackground';
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen bg-[#08080c]">
+    <main className="min-h-screen bg-[#08080c] relative">
+      <SparkleBackground />
       <NavBar />
 
-      <div className="pt-14">
+      <div className="pt-14 relative z-10">
         {/* Hero */}
         <div className="relative overflow-hidden border-b border-white/[0.04]">
           <div className="absolute inset-0 bg-gradient-to-br from-cyan-600/20 via-purple-600/10 to-pink-600/10" />

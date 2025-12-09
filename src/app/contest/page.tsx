@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import NavBar from '@/components/NavBar';
+import SparkleBackground from '@/components/SparkleBackground';
 import { getCurrentUser } from '@/lib/userStore';
 
 interface ContestMovie {
@@ -133,10 +134,11 @@ export default function ContestPage() {
   if (!user) return <div className="min-h-screen bg-[#08080c] flex items-center justify-center"><div className="w-10 h-10 border-2 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" /></div>;
 
   return (
-    <main className="min-h-screen bg-[#08080c]">
+    <main className="min-h-screen bg-[#08080c] relative">
+      <SparkleBackground />
       <NavBar userAvatar={user?.avatar} />
 
-      <div className="pt-14">
+      <div className="pt-14 relative z-10">
         {!selectedMovie ? (
           /* MOVIE SELECTION */
           <div className="max-w-[1400px] mx-auto px-6 py-10">
