@@ -5,9 +5,9 @@ import NavBar from '@/components/NavBar';
 import SparkleBackground from '@/components/SparkleBackground';
 
 const GENERATION_COST = 2.40;  // 3x 8-sec clips @ $0.80 each
-const STAKE_AMOUNT = 4.80;     // 2x Veo cost
-const PLATFORM_FEE = 0.50;     // Per submission
-const TOTAL_TO_COMPETE = GENERATION_COST + STAKE_AMOUNT; // $7.20
+const STAKE_TO_POOL = 1.90;    // Goes to prize pool
+const PLATFORM_FEE = 0.50;     // Platform fee
+const TOTAL_TO_COMPETE = GENERATION_COST + STAKE_TO_POOL + PLATFORM_FEE; // $4.80
 
 // Base Sepolia testnet config
 const BASE_SEPOLIA_CONFIG = {
@@ -190,7 +190,7 @@ export default function WalletPage() {
       <SparkleBackground />
       <NavBar />
 
-      <div className="pt-24 max-w-3xl mx-auto px-4 sm:px-6 py-10 relative z-10">
+      <div className="pt-28 max-w-3xl mx-auto px-4 sm:px-6 py-8 relative z-10">
         {/* Header */}
         <div className="text-center mb-10">
           <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-4">
@@ -335,8 +335,8 @@ export default function WalletPage() {
               <span className="font-medium">${GENERATION_COST.toFixed(2)}</span>
             </div>
             <div className="flex justify-between items-center py-2 border-b border-white/10">
-              <span className="text-white/60">Contest Stake (2x Veo cost → prize pool)</span>
-              <span className="font-medium">${STAKE_AMOUNT.toFixed(2)}</span>
+              <span className="text-white/60">Stake (goes to prize pool)</span>
+              <span className="font-medium">${STAKE_TO_POOL.toFixed(2)}</span>
             </div>
             <div className="flex justify-between items-center py-2 border-b border-white/10">
               <span className="text-white/60">Platform Fee</span>
@@ -344,12 +344,12 @@ export default function WalletPage() {
             </div>
             <div className="flex justify-between items-center py-2">
               <span className="font-bold">Total to Compete</span>
-              <span className="text-xl font-bold text-purple-400">${(TOTAL_TO_COMPETE + PLATFORM_FEE).toFixed(2)}</span>
+              <span className="text-xl font-bold text-purple-400">${TOTAL_TO_COMPETE.toFixed(2)}</span>
             </div>
           </div>
 
           <p className="text-white/40 text-xs">
-            $0.50 platform fee per submission. Stake goes to prize pool, top 3 split it.
+            Stake goes to prize pool, top 3 split 80%.
           </p>
         </div>
 
