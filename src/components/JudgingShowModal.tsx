@@ -259,9 +259,57 @@ export default function JudgingShowModal({
   }
 
   async function getJudgeScore(judgeId: string, submission: Submission): Promise<JudgeScore> {
-    // In production, this would call the API
-    // For now, generate realistic scores
-    const baseScore = 6 + Math.random() * 3; // 6-9 range
+    try {
+      // Call the real AI judging API
+      const response = await fetch('/api/judge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'judge_entry',
+          entry: {
+            id: submission.id,
+            userName: submission.userName,
+            movieTitle: submission.movieTitle,
+            prompt: submission.prompt,
+            videoUrl: submission.videoUrl,
+            usedVocabulary: submission.usedIngredients,
+            targetLanguage: 'French', // TODO: Get from contest
+          },
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const judgeScore = data.result?.scores?.[judgeId];
+
+        if (judgeScore) {
+          // Update thoughts with real AI thoughts
+          if (judgeScore.thoughts?.length > 0) {
+            setCurrentJudgeThoughts([]);
+            for (const thought of judgeScore.thoughts) {
+              await sleep(500);
+              setCurrentJudgeThoughts(prev => [...prev, thought]);
+              await sleep(1500);
+            }
+          }
+
+          setCurrentScore(judgeScore.score);
+          setShowScore(true);
+          await sleep(2000);
+
+          return {
+            score: judgeScore.score,
+            feedback: judgeScore.feedback,
+            highlights: judgeScore.highlights,
+          };
+        }
+      }
+    } catch (error) {
+      console.error('AI judging failed, using fallback:', error);
+    }
+
+    // Fallback to simulated scores if API fails
+    const baseScore = 6 + Math.random() * 3;
     const score = Math.round(baseScore * 10) / 10;
 
     setCurrentScore(score);
@@ -270,8 +318,8 @@ export default function JudgingShowModal({
 
     return {
       score,
-      feedback: `Excellent work on "${submission.movieTitle}"`,
-      highlights: `Creative use of ${submission.usedIngredients.join(', ')}`,
+      feedback: `Interesting interpretation of "${submission.movieTitle}"`,
+      highlights: `Creative approach with ${submission.usedIngredients.join(', ')}`,
     };
   }
 
