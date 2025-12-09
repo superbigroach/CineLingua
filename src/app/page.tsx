@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { Movie, FRANCOPHONE_REGIONS, LEARNING_LANGUAGES, LearningLanguage, getImageUrl, getLanguageByCode } from '@/lib/tmdb';
 import {
   User, getCurrentUser, loginUser, logoutUser, getLevelFromXP,
@@ -103,6 +104,8 @@ function SparkleCanvas() {
 }
 
 export default function Home() {
+  const router = useRouter();
+
   // Core state
   const [movies, setMovies] = useState<Movie[]>([]);
   const [selectedRegion, setSelectedRegion] = useState<string>('');
@@ -112,6 +115,7 @@ export default function Home() {
   const [trailerKey, setTrailerKey] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingContent, setLoadingContent] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
   // User state
   const [user, setUser] = useState<User | null>(null);
@@ -135,12 +139,17 @@ export default function Home() {
   // Refs
   const tutorPanelRef = useRef<HTMLDivElement>(null);
 
-  // Load user on mount
+  // Check auth and redirect to login if not logged in
   useEffect(() => {
     const savedUser = getCurrentUser();
-    if (savedUser) setUser(savedUser);
+    if (!savedUser) {
+      router.push('/login');
+      return;
+    }
+    setUser(savedUser);
+    setCheckingAuth(false);
     fetchMovies();
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     fetchMovies();
@@ -288,6 +297,18 @@ export default function Home() {
   }
 
   const levelInfo = user ? getLevelFromXP(user.xp) : null;
+
+  // Show loading while checking auth
+  if (checkingAuth) {
+    return (
+      <div className="min-h-screen bg-[#08080c] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-2 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-white/40 text-sm">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <main className="min-h-screen relative bg-[#08080c]">
