@@ -19,6 +19,7 @@ export default function NavBar({ user, onLeaderboard, onInvite }: NavBarProps) {
 
   const links = [
     { href: '/', label: 'Learn' },
+    { href: '/studio', label: 'Studio' },
     { href: '/contest', label: 'Contest' },
     { href: '/wallet', label: 'Wallet' },
     { href: '/about', label: 'Info' },

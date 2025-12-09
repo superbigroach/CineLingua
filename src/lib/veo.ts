@@ -195,55 +195,283 @@ export function validatePromptContainsWords(
   };
 }
 
+// Vertex AI configuration
+const VERTEX_PROJECT_ID = process.env.GOOGLE_CLOUD_PROJECT || '';
+const VERTEX_LOCATION = process.env.VERTEX_AI_LOCATION || 'us-central1';
+const VEO_MODEL_ID = 'veo-2.0-generate-001'; // Veo 2 model
+
+// Get access token from service account or ADC
+async function getAccessToken(): Promise<string> {
+  // Check for service account JSON credentials
+  const serviceAccountJson = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
+
+  if (serviceAccountJson) {
+    // Parse service account credentials and generate JWT
+    const credentials = JSON.parse(serviceAccountJson);
+    const jwt = await generateServiceAccountJWT(credentials);
+    return jwt;
+  }
+
+  // Fallback: use metadata server (for Cloud Run/GCE)
+  try {
+    const response = await fetch(
+      'http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token',
+      { headers: { 'Metadata-Flavor': 'Google' } }
+    );
+    const data = await response.json();
+    return data.access_token;
+  } catch {
+    throw new Error('No Google Cloud credentials configured. Set GOOGLE_APPLICATION_CREDENTIALS_JSON env var.');
+  }
+}
+
+// Generate JWT from service account credentials
+async function generateServiceAccountJWT(credentials: {
+  client_email: string;
+  private_key: string;
+}): Promise<string> {
+  const header = {
+    alg: 'RS256',
+    typ: 'JWT',
+  };
+
+  const now = Math.floor(Date.now() / 1000);
+  const payload = {
+    iss: credentials.client_email,
+    sub: credentials.client_email,
+    aud: 'https://oauth2.googleapis.com/token',
+    iat: now,
+    exp: now + 3600,
+    scope: 'https://www.googleapis.com/auth/cloud-platform',
+  };
+
+  // Create the JWT
+  const encoder = new TextEncoder();
+  const headerB64 = btoa(JSON.stringify(header)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+  const payloadB64 = btoa(JSON.stringify(payload)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+  const signatureInput = `${headerB64}.${payloadB64}`;
+
+  // Sign with private key using Web Crypto API
+  const privateKey = await crypto.subtle.importKey(
+    'pkcs8',
+    pemToArrayBuffer(credentials.private_key),
+    { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+
+  const signature = await crypto.subtle.sign(
+    'RSASSA-PKCS1-v1_5',
+    privateKey,
+    encoder.encode(signatureInput)
+  );
+
+  const signatureB64 = btoa(String.fromCharCode(...new Uint8Array(signature)))
+    .replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+
+  const jwt = `${signatureInput}.${signatureB64}`;
+
+  // Exchange JWT for access token
+  const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+      assertion: jwt,
+    }),
+  });
+
+  const tokenData = await tokenResponse.json();
+  if (!tokenData.access_token) {
+    throw new Error(`Failed to get access token: ${JSON.stringify(tokenData)}`);
+  }
+
+  return tokenData.access_token;
+}
+
+// Convert PEM to ArrayBuffer
+function pemToArrayBuffer(pem: string): ArrayBuffer {
+  const b64 = pem
+    .replace(/-----BEGIN PRIVATE KEY-----/, '')
+    .replace(/-----END PRIVATE KEY-----/, '')
+    .replace(/\n/g, '');
+  const binary = atob(b64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes.buffer;
+}
+
+export interface VeoGenerationJob {
+  jobId: string;
+  operationName: string;
+  estimatedTime: number;
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+}
+
 // Generate video using Veo 2 API (via Vertex AI)
-// Note: This is a placeholder - actual implementation requires Vertex AI setup
 export async function generateVideoWithVeo(
   prompt: string,
   options: {
     duration?: number;
     aspectRatio?: '16:9' | '9:16' | '1:1';
     resolution?: '720p' | '1080p';
+    negativePrompt?: string;
   } = {}
-): Promise<{ jobId: string; estimatedTime: number }> {
-  // In production, this would call the Vertex AI Veo API:
-  // POST https://us-central1-aiplatform.googleapis.com/v1/projects/{PROJECT}/locations/us-central1/publishers/google/models/veo-2.0-generate-exp:predict
+): Promise<VeoGenerationJob> {
+  if (!VERTEX_PROJECT_ID) {
+    throw new Error('GOOGLE_CLOUD_PROJECT environment variable not set');
+  }
 
-  // For now, return a mock job ID
-  // The actual implementation would use the Google Cloud client library
+  const accessToken = await getAccessToken();
 
-  const jobId = `veo_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  // Vertex AI Veo endpoint
+  const endpoint = `https://${VERTEX_LOCATION}-aiplatform.googleapis.com/v1/projects/${VERTEX_PROJECT_ID}/locations/${VERTEX_LOCATION}/publishers/google/models/${VEO_MODEL_ID}:generateVideo`;
+
+  const requestBody = {
+    instances: [{
+      prompt: prompt,
+    }],
+    parameters: {
+      aspectRatio: options.aspectRatio || '16:9',
+      durationSeconds: options.duration || VIDEO_DURATION_SECONDS,
+      resolution: options.resolution || '720p',
+      ...(options.negativePrompt && { negativePrompt: options.negativePrompt }),
+    },
+  };
 
   console.log('Veo Generation Request:', {
-    prompt,
+    endpoint,
+    prompt: prompt.substring(0, 100) + '...',
     duration: options.duration || VIDEO_DURATION_SECONDS,
     aspectRatio: options.aspectRatio || '16:9',
-    resolution: options.resolution || '720p',
   });
 
-  // Veo typically takes 2-5 minutes for an 8-second clip
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(requestBody),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('Veo API error:', errorText);
+    throw new Error(`Veo API error: ${response.status} - ${errorText}`);
+  }
+
+  const result = await response.json();
+
+  // Veo returns a long-running operation
+  const operationName = result.name || result.operationName;
+  const jobId = `veo_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
   return {
     jobId,
-    estimatedTime: 180, // seconds
+    operationName,
+    estimatedTime: 180, // Veo typically takes 2-5 minutes
+    status: 'pending',
   };
 }
 
 // Check video generation status
 export async function checkVeoJobStatus(
-  jobId: string
+  operationName: string
 ): Promise<{
   status: 'pending' | 'processing' | 'completed' | 'failed';
   progress?: number;
   videoUrl?: string;
-  thumbnailUrl?: string;
+  videoGcsUri?: string;
   error?: string;
 }> {
-  // In production, this would poll the Vertex AI job status
-  // For demo, simulate progress
+  if (!VERTEX_PROJECT_ID) {
+    throw new Error('GOOGLE_CLOUD_PROJECT environment variable not set');
+  }
 
+  const accessToken = await getAccessToken();
+
+  // Poll the long-running operation
+  const endpoint = `https://${VERTEX_LOCATION}-aiplatform.googleapis.com/v1/${operationName}`;
+
+  const response = await fetch(endpoint, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    return {
+      status: 'failed',
+      error: `Failed to check status: ${response.status} - ${errorText}`,
+    };
+  }
+
+  const result = await response.json();
+
+  // Check if operation is done
+  if (result.done) {
+    if (result.error) {
+      return {
+        status: 'failed',
+        error: result.error.message || 'Video generation failed',
+      };
+    }
+
+    // Extract video URL from response
+    const videos = result.response?.generatedVideos || result.response?.videos || [];
+    if (videos.length > 0) {
+      const video = videos[0];
+      return {
+        status: 'completed',
+        progress: 100,
+        videoUrl: video.uri || video.url,
+        videoGcsUri: video.gcsUri,
+      };
+    }
+
+    return {
+      status: 'completed',
+      progress: 100,
+    };
+  }
+
+  // Still processing
+  const metadata = result.metadata || {};
   return {
-    status: 'pending',
-    progress: 0,
+    status: 'processing',
+    progress: metadata.progressPercent || 50,
   };
+}
+
+// Download video from GCS and get a temporary signed URL
+export async function getVideoDownloadUrl(gcsUri: string): Promise<string> {
+  if (!gcsUri.startsWith('gs://')) {
+    return gcsUri; // Already a URL
+  }
+
+  const accessToken = await getAccessToken();
+
+  // Parse GCS URI: gs://bucket/path/to/file
+  const match = gcsUri.match(/^gs:\/\/([^\/]+)\/(.+)$/);
+  if (!match) {
+    throw new Error(`Invalid GCS URI: ${gcsUri}`);
+  }
+
+  const [, bucket, object] = match;
+  const encodedObject = encodeURIComponent(object);
+
+  // Generate signed URL using the storage API
+  const endpoint = `https://storage.googleapis.com/storage/v1/b/${bucket}/o/${encodedObject}?alt=media`;
+
+  // For now, return a proxy URL through our API
+  // In production, you'd generate a signed URL
+  return `/api/video/proxy?uri=${encodeURIComponent(gcsUri)}`;
 }
 
 // Calculate costs for a submission
