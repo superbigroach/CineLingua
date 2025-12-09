@@ -15,6 +15,7 @@ import InviteFriendModal from '@/components/InviteFriendModal';
 import LoginModal from '@/components/LoginModal';
 import SceneCreatorModal from '@/components/SceneCreatorModal';
 import NavBar from '@/components/NavBar';
+import SparkleBackground from '@/components/SparkleBackground';
 
 // Toast Notification Component
 function Toast({ message, type = 'success', onClose }: { message: string; type?: 'success' | 'xp' | 'level'; onClose: () => void }) {
@@ -39,70 +40,6 @@ function Toast({ message, type = 'success', onClose }: { message: string; type?:
   );
 }
 
-// Sparkle Canvas Component
-function SparkleCanvas() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    const sparkles: { x: number; y: number; size: number; speedX: number; speedY: number; opacity: number }[] = [];
-
-    for (let i = 0; i < 80; i++) {
-      sparkles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        size: Math.random() * 2 + 0.5,
-        speedX: (Math.random() - 0.5) * 0.3,
-        speedY: (Math.random() - 0.5) * 0.3,
-        opacity: Math.random() * 0.5 + 0.2,
-      });
-    }
-
-    function animate() {
-      if (!ctx || !canvas) return;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      sparkles.forEach((sparkle) => {
-        sparkle.x += sparkle.speedX;
-        sparkle.y += sparkle.speedY;
-
-        if (sparkle.x < 0) sparkle.x = canvas.width;
-        if (sparkle.x > canvas.width) sparkle.x = 0;
-        if (sparkle.y < 0) sparkle.y = canvas.height;
-        if (sparkle.y > canvas.height) sparkle.y = 0;
-
-        sparkle.opacity = 0.2 + Math.abs(Math.sin(Date.now() * 0.001 + sparkle.x)) * 0.5;
-
-        ctx.beginPath();
-        ctx.arc(sparkle.x, sparkle.y, sparkle.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 255, 255, ${sparkle.opacity})`;
-        ctx.fill();
-      });
-
-      requestAnimationFrame(animate);
-    }
-
-    animate();
-
-    const handleResize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  return <canvas ref={canvasRef} id="sparkle-canvas" />;
-}
 
 export default function Home() {
   const router = useRouter();
@@ -313,7 +250,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen relative bg-[#08080c]">
-      <SparkleCanvas />
+      <SparkleBackground />
 
       <NavBar
         user={user ? { name: user.name, avatar: user.avatar, xp: user.xp, streak: user.streak } : null}
