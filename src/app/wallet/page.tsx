@@ -1,12 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import NavBar from '@/components/NavBar';
 
-// Pricing constants (must match SceneCreatorModal)
-const GENERATION_COST = 0.80; // $0.80 for 8 seconds at $0.10/sec (Veo 3.1 Fast)
-const STAKE_AMOUNT = 1.60;    // $1.60 stake (2x generation cost)
-const TOTAL_TO_COMPETE = GENERATION_COST + STAKE_AMOUNT; // $2.40
+const GENERATION_COST = 2.40;
+const STAKE_AMOUNT = 1.60;
+const TOTAL_TO_COMPETE = GENERATION_COST + STAKE_AMOUNT;
 
 // Base Sepolia testnet config
 const BASE_SEPOLIA_CONFIG = {
@@ -186,30 +185,9 @@ export default function WalletPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#0a0a12] via-[#0f0f1a] to-[#0a0a12] text-white">
-      {/* Navigation */}
-      <nav className="px-4 py-4 border-b border-white/10">
-        <div className="max-w-3xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-white font-bold text-sm">
-              CL
-            </div>
-            <span className="text-lg font-bold">
-              <span className="text-white">Cine</span>
-              <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Lingua</span>
-            </span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link href="/contest" className="text-white/50 hover:text-white text-sm transition-colors">
-              Contest
-            </Link>
-            <Link href="/" className="text-white/50 hover:text-white text-sm transition-colors">
-              Learn
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <NavBar />
 
-      <div className="max-w-3xl mx-auto px-4 py-10">
+      <div className="pt-14 max-w-3xl mx-auto px-4 py-10">
         {/* Header */}
         <div className="text-center mb-10">
           <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-4">
@@ -350,7 +328,7 @@ export default function WalletPage() {
 
           <div className="space-y-3 mb-4">
             <div className="flex justify-between items-center py-2 border-b border-white/10">
-              <span className="text-white/60">Video Generation (8 sec @ $0.10/s)</span>
+              <span className="text-white/60">Video Generation (3x 8-sec clips @ $0.10/s)</span>
               <span className="font-medium">${GENERATION_COST.toFixed(2)}</span>
             </div>
             <div className="flex justify-between items-center py-2 border-b border-white/10">
@@ -423,7 +401,7 @@ export default function WalletPage() {
             {[
               { step: 1, title: 'Get Testnet USDC', desc: 'Use Circle faucet to get free USDC on Base Sepolia' },
               { step: 2, title: 'Learn & Create', desc: 'Watch trailers, pass quizzes, unlock vocabulary words' },
-              { step: 3, title: 'Write Your Scene', desc: 'Use unlocked words to write an 8-second cinematic scene' },
+              { step: 3, title: 'Write Your Scene', desc: 'Use unlocked words to create 3x 8-second cinematic clips' },
               { step: 4, title: 'Enter Contest', desc: `Pay $${TOTAL_TO_COMPETE.toFixed(2)} USDC to generate video & enter prize pool` },
               { step: 5, title: 'Win Prizes', desc: 'Top 3 split 80% of pool. AI judges score your scene!' },
             ].map((item) => (

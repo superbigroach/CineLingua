@@ -65,7 +65,9 @@ type Step = 'loading' | 'quiz' | 'unlocked' | 'create' | 'generating' | 'preview
 
 // Constants
 const MIN_INGREDIENTS_REQUIRED = 3;
-const GENERATION_COST = 0.80;
+const VIDEO_CLIPS = 3;            // Number of 8-second clips to generate
+const COST_PER_CLIP = 0.80;       // $0.80 per 8-second clip
+const GENERATION_COST = VIDEO_CLIPS * COST_PER_CLIP; // $2.40 total
 const STAKE_AMOUNT = 1.60;
 
 const difficultyConfig = {
@@ -639,7 +641,7 @@ export default function SceneCreatorModal({
                     setUserPrompt(e.target.value);
                     validatePrompt(e.target.value);
                   }}
-                  placeholder={`Describe your 8-second scene...\n\nTip: You can write in ${language} or English!`}
+                  placeholder={`Describe your cinematic scene (we'll generate 3x 8-second clips)...\n\nTip: You can write in ${language} or English!`}
                   className="w-full h-32 p-4 bg-black/40 rounded-xl border-2 border-white/10 text-white placeholder-white/30 focus:border-purple-500/50 focus:outline-none resize-none text-base"
                 />
               </div>
@@ -760,7 +762,7 @@ export default function SceneCreatorModal({
 
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-white/60">Video Generation (8 sec)</span>
+                    <span className="text-white/60">Video Generation ({VIDEO_CLIPS}x 8-sec clips)</span>
                     <span className="text-white font-medium">${GENERATION_COST.toFixed(2)}</span>
                   </div>
 

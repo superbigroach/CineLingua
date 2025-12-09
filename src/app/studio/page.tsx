@@ -278,14 +278,12 @@ export default function StudioPage() {
             </span>
           </a>
 
-          <div className="flex items-center gap-4">
-            <a href="/" className="text-white/50 hover:text-white text-sm transition-colors">
-              Learn
-            </a>
+          <div className="flex items-center gap-6">
+            <a href="/" className="text-white/50 hover:text-white text-sm transition-colors">Learn</a>
             <span className="text-cyan-400 text-sm font-medium">Studio</span>
-            <a href="/contest" className="text-white/50 hover:text-white text-sm transition-colors">
-              Contest
-            </a>
+            <a href="/contest" className="text-white/50 hover:text-white text-sm transition-colors">Contest</a>
+            <a href="/wallet" className="text-white/50 hover:text-white text-sm transition-colors">Wallet</a>
+            <a href="/about" className="text-white/50 hover:text-white text-sm transition-colors">About</a>
           </div>
 
           <div className="flex items-center gap-3">
