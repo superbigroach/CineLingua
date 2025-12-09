@@ -14,10 +14,12 @@ export const BASE_SEPOLIA_CHAIN = {
 };
 
 // Pricing constants (in USDC with 6 decimals)
-export const GENERATION_COST = 2_400_000; // $2.40
-export const STAKE_TO_POOL = 1_900_000;   // $1.90
-export const PLATFORM_FEE = 500_000;      // $0.50
-export const TOTAL_ENTRY_COST = 4_800_000; // $4.80
+// 3x 8-second videos = 24 seconds @ $0.10/sec = $2.40 generation cost
+// Total entry = $2.40 (goes to prize pool, platform takes 20% from winnings)
+export const GENERATION_COST = 2_400_000; // $2.40 (video generation)
+export const MIN_STAKE = 2_400_000;       // $2.40 (contract minimum)
+export const TOTAL_ENTRY_COST = 2_400_000; // $2.40 total
+// Note: Platform takes 20% from the prize pool at finalization, not upfront
 
 // Contract ABIs (minimal for frontend interaction)
 export const CONTEST_ABI = [

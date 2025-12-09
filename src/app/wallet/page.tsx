@@ -13,10 +13,12 @@ import {
   switchToBaseSepolia,
 } from '@/lib/contract';
 
-const GENERATION_COST = 2.40;  // 3x 8-sec clips @ $0.80 each
-const STAKE_TO_POOL = 1.90;    // Goes to prize pool
-const PLATFORM_FEE = 0.50;     // Platform fee
-const TOTAL_TO_COMPETE = GENERATION_COST + STAKE_TO_POOL + PLATFORM_FEE; // $4.80
+// Economics: $2.40 entry = generation cost for 3x 8-sec clips (24 sec @ $0.10/sec)
+// 100% of entry goes to prize pool
+// Platform takes 20% from winnings at finalization (not upfront)
+const ENTRY_COST = 2.40;  // $2.40 total entry cost
+const GENERATION_COST = 2.40;  // Same as entry - covers 3x 8-sec clips
+const PLATFORM_FEE_PERCENT = 20;  // 20% taken from winnings
 
 // Faucet links
 const FAUCETS = [
@@ -175,7 +177,7 @@ export default function WalletPage() {
     }
   }
 
-  const canAffordContest = parseFloat(usdcBalance) >= TOTAL_TO_COMPETE;
+  const canAffordContest = parseFloat(usdcBalance) >= ENTRY_COST;
   const canAffordGeneration = parseFloat(usdcBalance) >= GENERATION_COST;
 
   return (
@@ -319,31 +321,38 @@ export default function WalletPage() {
         <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-2xl border border-purple-500/20 p-6 mb-8">
           <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
             <span className="text-xl">💰</span>
-            Contest Costs
+            Contest Economics
           </h2>
 
           <div className="space-y-3 mb-4">
             <div className="flex justify-between items-center py-2 border-b border-white/10">
-              <span className="text-white/60">Video Generation (3x 8-sec clips)</span>
-              <span className="font-medium">${GENERATION_COST.toFixed(2)}</span>
+              <span className="text-white/60">Entry Cost (3x 8-sec video generation)</span>
+              <span className="font-medium">${ENTRY_COST.toFixed(2)}</span>
             </div>
             <div className="flex justify-between items-center py-2 border-b border-white/10">
-              <span className="text-white/60">Stake (goes to prize pool)</span>
-              <span className="font-medium">${STAKE_TO_POOL.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between items-center py-2 border-b border-white/10">
-              <span className="text-white/60">Platform Fee</span>
-              <span className="font-medium">${PLATFORM_FEE.toFixed(2)}</span>
+              <span className="text-white/60">→ 100% goes to prize pool</span>
+              <span className="font-medium text-emerald-400">+${ENTRY_COST.toFixed(2)}</span>
             </div>
             <div className="flex justify-between items-center py-2">
-              <span className="font-bold">Total to Compete</span>
-              <span className="text-xl font-bold text-purple-400">${TOTAL_TO_COMPETE.toFixed(2)}</span>
+              <span className="font-bold">Total to Enter</span>
+              <span className="text-xl font-bold text-purple-400">${ENTRY_COST.toFixed(2)} USDC</span>
             </div>
           </div>
 
-          <p className="text-white/40 text-xs">
-            Stake goes to prize pool, top 3 split 80%.
-          </p>
+          <div className="bg-white/5 rounded-xl p-4 space-y-2">
+            <p className="text-white/60 text-sm font-medium">Prize Distribution (at contest end):</p>
+            <div className="flex justify-between text-sm">
+              <span className="text-white/40">Platform takes</span>
+              <span className="text-amber-400">{PLATFORM_FEE_PERCENT}% of pool</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-white/40">Winners split</span>
+              <span className="text-emerald-400">80% of pool</span>
+            </div>
+            <div className="text-white/30 text-xs mt-2">
+              1st: 50% • 2nd: 30% • 3rd: 20%
+            </div>
+          </div>
         </div>
 
         {/* Faucets */}
@@ -402,7 +411,7 @@ export default function WalletPage() {
               { step: 1, title: 'Get Testnet USDC', desc: 'Use Circle faucet to get free USDC on Base Sepolia' },
               { step: 2, title: 'Learn & Create', desc: 'Watch trailers, pass quizzes, unlock vocabulary words' },
               { step: 3, title: 'Write Your Scene', desc: 'Use unlocked words to create 3x 8-second cinematic clips' },
-              { step: 4, title: 'Enter Contest', desc: `Pay $${TOTAL_TO_COMPETE.toFixed(2)} USDC to generate video & enter prize pool` },
+              { step: 4, title: 'Enter Contest', desc: `Pay $${ENTRY_COST.toFixed(2)} USDC to generate video & enter prize pool` },
               { step: 5, title: 'Win Prizes', desc: 'Top 3 split 80% of pool. AI judges score your scene!' },
             ].map((item) => (
               <div key={item.step} className="flex gap-4">

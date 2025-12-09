@@ -38,9 +38,9 @@ contract CineSceneContest is Ownable, ReentrancyGuard {
     uint256 public constant BPS_DENOMINATOR = 10000;
 
     // Pricing based on Google Veo 3.1 Fast ($0.10/second, video only)
-    // 8-second video = $0.80 generation cost
-    // Minimum stake = 2x generation cost = $1.60 (1_600_000 in USDC 6 decimals)
-    uint256 public constant DEFAULT_MIN_STAKE = 1_600_000; // $1.60 USDC (6 decimals)
+    // 3x 8-second videos = 24 seconds per scene = $2.40 generation cost
+    // Minimum stake = generation cost = $2.40 (2_400_000 in USDC 6 decimals)
+    uint256 public constant DEFAULT_MIN_STAKE = 2_400_000; // $2.40 USDC (6 decimals)
 
     // Judging delay - 30 minutes after contest ends before judging can begin
     // This gives time for all participants to watch the live judging show

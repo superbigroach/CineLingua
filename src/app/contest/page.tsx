@@ -252,11 +252,11 @@ export default function ContestPage() {
                     <span className="text-2xl">4</span>
                   </div>
                   <h3 className="font-bold text-white text-sm mb-1">Submit</h3>
-                  <p className="text-white/40 text-xs">$4.80 USDC</p>
+                  <p className="text-white/40 text-xs">$2.40 USDC</p>
                 </button>
               </div>
               <p className="text-center text-white/30 text-xs mt-4">
-                $2.40 generation + $1.90 stake + $0.50 platform • Top 3 split 80% of pool
+                $2.40 entry → 100% to prize pool • Platform takes 20% from winnings • Top 3 split remaining 80%
               </p>
             </div>
 
