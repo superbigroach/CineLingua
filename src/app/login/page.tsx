@@ -361,21 +361,21 @@ export default function LoginPage() {
             />
 
             <form onSubmit={handleSubmit} className="relative space-y-5">
-              <div className="space-y-2">
-                <label className="block text-xs font-medium text-white/40 uppercase tracking-wider">
-                  Name
+              <div className="space-y-2.5">
+                <label className="block text-sm font-medium text-white/70 pl-1">
+                  Username
                 </label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Your name"
+                  placeholder="Your username"
                   className="w-full h-14 bg-white/[0.03] border border-white/[0.08] rounded-xl px-5 text-white text-base placeholder-white/20 focus:outline-none focus:border-cyan-500/50 focus:bg-white/[0.05] focus:shadow-[0_0_20px_rgba(6,182,212,0.15)] transition-all duration-300"
                 />
               </div>
 
-              <div className="space-y-2">
-                <label className="block text-xs font-medium text-white/40 uppercase tracking-wider">
+              <div className="space-y-2.5">
+                <label className="block text-sm font-medium text-white/70 pl-1">
                   Email
                 </label>
                 <input
