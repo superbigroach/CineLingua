@@ -1,13 +1,15 @@
-# CineLingua - Learn French Through Cinema
+# CineLingua - Learn Languages Through Cinema & AI Video Creation
 
-**Built for Agentics TV5 Hackathon 2025**
+**Built for Google AI Hackathon 2025**
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-cine--lingua.vercel.app-purple)](https://cine-lingua.vercel.app)
-[![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org)
-[![Google AI](https://img.shields.io/badge/Google%20AI-Gemini-blue)](https://ai.google.dev)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-cine--lingua.vercel.app-cyan)](https://cine-lingua.vercel.app)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org)
+[![Google Veo](https://img.shields.io/badge/Google-Veo%202-blue)](https://cloud.google.com/vertex-ai)
+[![Gemini](https://img.shields.io/badge/Google-Gemini%202.5-purple)](https://ai.google.dev)
+[![Base](https://img.shields.io/badge/Base-Sepolia-0052FF)](https://base.org)
 [![Supabase](https://img.shields.io/badge/Supabase-Database-green)](https://supabase.com)
 
-An AI-powered language learning platform that helps users discover popular movies from Francophone regions worldwide and learn French through cinema. Watch trailers, learn vocabulary, take quizzes, compete on leaderboards, and immerse yourself in French culture!
+An AI-powered language learning platform that combines cinema, AI video generation, and Web3 contests. Watch trailers, learn vocabulary, create AI-generated movie scenes with **Google Veo 2**, compete in weekly contests, and win **USDC prizes** on Base blockchain!
 
 ## Live Demo
 
@@ -15,190 +17,124 @@ An AI-powered language learning platform that helps users discover popular movie
 
 ---
 
-## How to Use CineLingua (Step-by-Step Guide)
+## What Makes CineLingua Special
 
-### Getting Started
-
-1. **Visit the App** - Go to [cine-lingua.vercel.app](https://cine-lingua.vercel.app)
-2. **Create Account** (Optional but recommended)
-   - Click the **"Login"** button in the top-right corner
-   - Enter your name and email
-   - Click **"Start Learning French!"**
-   - Your progress will now be tracked and saved
-
-### Browsing Movies
-
-1. **View Movie Grid** - You'll see 16 popular French movies displayed as posters
-2. **Filter by Region** - Click any flag button to see movies from specific Francophone regions:
-   - 🇫🇷 France | 🇧🇪 Belgium | 🇨🇦 Canada | 🇨🇭 Switzerland
-   - 🇸🇳 Senegal | 🇲🇦 Morocco | 🇹🇳 Tunisia | 🇨🇮 Ivory Coast
-3. **Click "All French"** to see movies from all regions
-
-### Learning from a Movie
-
-1. **Click any movie poster** - This triggers the learning experience:
-   - ✅ YouTube trailer loads automatically (with French captions)
-   - ✅ AI generates vocabulary and phrases
-   - ✅ You earn **+10 XP** for exploring
-   - ✅ Side-by-side French/English title appears
-
-2. **Watch the Trailer** - Listen to authentic French dialogue with captions enabled
-
-3. **Study Vocabulary** (Right panel on desktop, below trailer on mobile)
-   - See 6+ vocabulary words with translations
-   - Each word shows difficulty level (beginner/intermediate/advanced)
-   - **Click the speaker icon** 🔊 to hear pronunciation
-
-4. **Read Useful Phrases** - Common expressions from the movie with meanings
-
-### Interactive Features
-
-#### Take a Quiz
-1. Click the **"Quiz"** button (purple brain icon)
-2. Answer multiple-choice questions about the vocabulary
-3. See instant feedback - green for correct, red for wrong
-4. Get explanations after each question
-5. Earn **+25 XP** for completing, **+50 XP** for perfect score!
-
-#### Practice with Flashcards
-1. Click the **"Flashcards"** button (cyan cards icon)
-2. See a French word on the card
-3. **Click the card** to flip and reveal the English translation
-4. **Swipe right** or click ✓ if you know it (earns +5 XP)
-5. **Swipe left** or click ✗ to keep practicing
-6. Click 🔊 to hear pronunciation
-
-#### Chat with AI Tutor
-1. Click the **"Ask AI"** button (green robot icon)
-2. Type any question about French language or the movie
-3. Use quick suggestions like "Explain the grammar" or "More vocabulary"
-4. Have a conversation - the AI remembers context!
-
-### Gamification Features
-
-#### XP & Leveling
-- **Watch trailer**: +10 XP
-- **Learn a word**: +5 XP
-- **Complete quiz**: +25 XP
-- **Perfect quiz**: +50 XP
-- **Daily streak**: +15 XP
-- **Invite friend**: +100 XP
-
-#### 10 Levels to Achieve
-| Level | Title | XP Required |
-|-------|-------|-------------|
-| 1 | Débutant | 0 |
-| 2 | Novice | 100 |
-| 3 | Apprenti | 300 |
-| 4 | Intermédiaire | 600 |
-| 5 | Avancé | 1,000 |
-| 6 | Expert | 1,500 |
-| 7 | Maître | 2,100 |
-| 8 | Grand Maître | 2,800 |
-| 9 | Virtuose | 3,600 |
-| 10 | Francophile | 5,000 |
-
-#### Leaderboard
-1. Click the **trophy icon** 🏆 in the navbar
-2. View rankings for: Daily | Weekly | Monthly | All-Time
-3. See your position among all learners
-4. Top 3 get gold, silver, bronze medals!
-
-#### Invite Friends
-1. Click the **invite icon** 👤+ in the navbar
-2. Enter friend's email to send invite (+100 XP)
-3. Or share via Twitter, WhatsApp, LinkedIn
-4. Copy the link to share anywhere
-
-### Navbar Features (When Logged In)
-- **⭐ XP Counter** - Your total experience points
-- **🔥 Streak** - Days in a row you've learned
-- **🏆 Trophy** - Open leaderboard
-- **👤+ Invite** - Invite friends
-- **Avatar** - Your profile with level title
+| Feature | Technology | Description |
+|---------|------------|-------------|
+| **AI Video Generation** | Google Veo 2 | Create 8-second cinematic scenes from text prompts |
+| **Smart Vocabulary** | Google Gemini 2.5 | AI-generated vocabulary, quizzes, and tutoring |
+| **Weekly Contests** | Base Blockchain | Compete for USDC prize pools with smart contracts |
+| **AI Judges** | Gemini-powered | Three AI judges score submissions: Cinematographer, Linguist, Audience |
+| **Crypto Wallet** | Circle & MetaMask | Manage USDC earnings and contest entries |
 
 ---
 
-## Features Summary
+## App Structure
 
-### Core Learning
-- Regional movie discovery from 8+ Francophone countries
-- AI-generated vocabulary with difficulty levels
-- YouTube trailers with French captions
-- Useful phrases with contextual meanings
-- Side-by-side English/French translation
-- Text-to-speech pronunciation (Web Speech API)
-
-### Gamification
-- XP rewards for all learning activities
-- 10-level progression system with French titles
-- Daily streak tracking
-- Interactive quizzes with instant feedback
-- Swipeable flashcard learning
-- AI chatbot tutor (powered by Gemini)
-
-### Social
-- Global leaderboard (daily/weekly/monthly/all-time)
-- Friend invites via email
-- Social sharing (Twitter, WhatsApp, LinkedIn)
-- Cloud-synced progress (Supabase)
+```
+CineLingua/
+├── Learn      → Browse movies, watch trailers, learn vocabulary
+├── Studio     → Manage your AI-generated videos, explore others
+├── Contest    → Weekly competitions with real prizes
+├── Wallet     → USDC balance, transactions, earnings
+└── Info       → About the platform
+```
 
 ---
 
-## Quick Start (For Developers)
+## How It Works
 
-### Prerequisites
-- Node.js 18+
-- Free API keys (instructions below)
+### 1. Learn (Free)
+1. Browse movies from 8+ Francophone regions
+2. Watch YouTube trailers with French captions
+3. Study AI-generated vocabulary with pronunciation
+4. Take quizzes and practice with flashcards
+5. Chat with AI tutor for personalized help
 
-### 1. Clone & Install
+### 2. Create & Compete ($4.80 entry)
+1. **Take Quiz** → Unlock vocabulary "ingredients"
+2. **Write Scene** → Craft a prompt using unlocked words
+3. **Generate Video** → Veo 2 creates your 8-second scene
+4. **Submit** → Enter the weekly contest
 
-```bash
-git clone https://github.com/superbigroach/CineLingua.git
-cd CineLingua
-npm install
-```
+### 3. Win Prizes
+- **AI Judging** → Three judges score your submission (max 30 points)
+- **Live Show** → Winners announced in weekly livestream
+- **Prize Split**: 1st (50%) | 2nd (30%) | 3rd (20%)
 
-### 2. Get API Keys
+---
 
-**TMDB** (Movie Database - FREE):
-1. Sign up at https://www.themoviedb.org/signup
-2. Go to Settings → API → Request API key
-3. Copy "API Key (v3 auth)"
+## Contest Economics
 
-**Google Gemini** (AI - FREE tier):
-1. Go to https://aistudio.google.com/apikey
-2. Sign in with Google → Create API key
+| Cost Breakdown | Amount |
+|----------------|--------|
+| Video Generation (Veo 2) | $2.40 |
+| Prize Pool Stake | $1.90 |
+| Platform Fee | $0.50 |
+| **Total Entry** | **$4.80 USDC** |
 
-**Supabase** (Database - FREE tier):
-1. Go to https://supabase.com
-2. Create new project
-3. Copy Project URL and anon key from Settings → API
+**Prize Distribution:**
+- 80% → Winners pool (split 50/30/20)
+- 20% → Platform fee
 
-### 3. Configure Environment
+---
 
-Create `.env.local`:
+## Tech Stack
 
-```env
-NEXT_PUBLIC_TMDB_API_KEY=your_tmdb_key
-GEMINI_API_KEY=your_gemini_key
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
-```
+### Frontend
+- **Next.js 16** - React framework with App Router
+- **TypeScript** - Type-safe development
+- **Tailwind CSS** - Utility-first styling
+- **ethers.js** - Blockchain interactions
 
-### 4. Set Up Database
+### AI & Video
+- **Google Veo 2** - AI video generation (Vertex AI)
+- **Google Gemini 2.5 Flash** - Vocabulary, quizzes, judging, chat
+- **Web Speech API** - Text-to-speech pronunciation
 
-1. Go to Supabase Dashboard → SQL Editor
-2. Copy contents of `supabase-schema.sql`
-3. Run the query
+### Blockchain
+- **Base Sepolia** - Testnet for smart contracts
+- **Solidity** - Smart contract language
+- **USDC** - Stablecoin for payments
+- **Hardhat** - Contract development & deployment
 
-### 5. Run Locally
+### Backend & Data
+- **Supabase** - PostgreSQL database
+- **TMDB API** - Movie metadata & posters
+- **YouTube API** - Trailer embedding
+- **Circle** - Wallet infrastructure
 
-```bash
-npm run dev
-```
+---
 
-Open http://localhost:3000
+## Smart Contract
+
+**CineSceneContest.sol** - Deployed on Base Sepolia
+
+| Function | Description |
+|----------|-------------|
+| `submitEntry()` | Submit contest entry with USDC stake |
+| `updateVideoHash()` | Link generated video to entry |
+| `setScores()` | Admin sets AI judge scores |
+| `claimPrize()` | Winners claim their rewards |
+| `withdrawFees()` | Platform withdraws fees |
+
+**Contract Address:** `0x567aFe456ceCA40e108Edf3DF72D8b190C542A0f`
+
+**View on BaseScan:** [Contract Link](https://sepolia.basescan.org/address/0x567aFe456ceCA40e108Edf3DF72D8b190C542A0f)
+
+---
+
+## AI Judges
+
+Three AI personas powered by Gemini score each submission:
+
+| Judge | Focus | Criteria |
+|-------|-------|----------|
+| **Le Cinéaste** 🎬 | Visual Quality | Composition, lighting, camera work, mood |
+| **Le Linguiste** 🗣️ | Language Use | Vocabulary integration, cultural authenticity |
+| **Le Public** 🎭 | Entertainment | Creativity, emotional impact, memorability |
+
+Each judge scores 1-10. Maximum total: **30 points**.
 
 ---
 
@@ -208,73 +144,185 @@ Open http://localhost:3000
 cinelingua/
 ├── src/
 │   ├── app/
-│   │   ├── page.tsx              # Main app with all features
+│   │   ├── page.tsx                 # Learn - Movie browsing & vocabulary
+│   │   ├── studio/page.tsx          # Studio - Video management
+│   │   ├── contest/page.tsx         # Contest - Weekly competitions
+│   │   ├── wallet/page.tsx          # Wallet - USDC & transactions
+│   │   ├── about/page.tsx           # Info - About the platform
+│   │   ├── login/page.tsx           # Authentication
 │   │   └── api/
-│   │       ├── movies/route.ts   # TMDB movie fetching
-│   │       ├── learn/route.ts    # Gemini AI vocabulary/quiz
-│   │       ├── chat/route.ts     # AI chatbot
-│   │       └── trailer/route.ts  # YouTube trailer
+│   │       ├── video/generate/      # Veo video generation
+│   │       ├── scene-challenge/     # Contest logic & judging
+│   │       ├── chat/                # AI tutor chatbot
+│   │       ├── learn/               # Vocabulary generation
+│   │       ├── movies/              # TMDB integration
+│   │       └── wallet/              # Circle wallet API
 │   ├── components/
-│   │   ├── LoginModal.tsx        # User registration
-│   │   ├── QuizModal.tsx         # Interactive quiz
-│   │   ├── FlashcardModal.tsx    # Swipeable cards
-│   │   ├── ChatbotModal.tsx      # AI conversation
-│   │   ├── LeaderboardModal.tsx  # Rankings
-│   │   └── InviteFriendModal.tsx # Social sharing
+│   │   ├── SceneCreatorModal.tsx    # Video prompt builder
+│   │   ├── JudgingShowModal.tsx     # Live judging display
+│   │   ├── QuizModal.tsx            # Vocabulary quizzes
+│   │   ├── FlashcardModal.tsx       # Swipeable flashcards
+│   │   ├── ChatbotModal.tsx         # AI conversation
+│   │   └── NavBar.tsx               # Navigation
 │   └── lib/
-│       ├── supabase.ts           # Database client
-│       ├── userStore.ts          # User/XP management
-│       ├── tmdb.ts               # Movie API
-│       └── gemini.ts             # AI agents
-├── supabase-schema.sql           # Database tables
-└── README.md
+│       ├── veo.ts                   # Google Veo integration
+│       ├── contract.ts              # Smart contract helpers
+│       ├── sceneChallenge.ts        # Contest logic
+│       ├── circle.ts                # Circle wallet
+│       ├── supabase.ts              # Database client
+│       └── gemini.ts                # AI prompts
+├── contracts/
+│   ├── CineSceneContest.sol         # Main contest contract
+│   ├── scripts/deploy.ts            # Deployment script
+│   └── hardhat.config.ts            # Hardhat configuration
+├── supabase-schema.sql              # Database schema
+└── supabase-schema-contests.sql     # Contest tables
 ```
 
 ---
 
-## Tech Stack
+## Environment Variables
 
-- **Frontend**: Next.js 14, React 18, TypeScript, Tailwind CSS
-- **AI**: Google Gemini 1.5 Flash
-- **Database**: Supabase (PostgreSQL)
-- **APIs**: TMDB (movies), YouTube (trailers)
-- **Speech**: Web Speech API
-- **Hosting**: Vercel
+```env
+# Google Cloud / Vertex AI (Veo)
+GOOGLE_CLOUD_PROJECT=your-project-id
+GOOGLE_APPLICATION_CREDENTIALS_JSON={"type":"service_account",...}
+VERTEX_AI_LOCATION=us-central1
+
+# Google Gemini
+GEMINI_API_KEY=your-gemini-key
+
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+
+# TMDB
+NEXT_PUBLIC_TMDB_API_KEY=your-tmdb-key
+
+# Smart Contract (Base Sepolia)
+NEXT_PUBLIC_CONTEST_CONTRACT=0x567aFe456ceCA40e108Edf3DF72D8b190C542A0f
+DEPLOYER_PRIVATE_KEY=0x...  # Only for deployment
+BASESCAN_API_KEY=your-key   # For verification
+
+# Circle (Wallet)
+CIRCLE_TESTNET_API_KEY=your-key
+CIRCLE_WALLET_SET_ID=your-wallet-set
+NEXT_PUBLIC_CIRCLE_CLIENT_URL=https://...
+```
+
+---
+
+## Quick Start
+
+### Prerequisites
+- Node.js 18+
+- Google Cloud account with Vertex AI enabled
+- MetaMask wallet with Base Sepolia testnet
+
+### Installation
+
+```bash
+# Clone repository
+git clone https://github.com/superbigroach/CineLingua.git
+cd CineLingua
+
+# Install dependencies
+npm install
+
+# Set up environment
+cp .env.example .env.local
+# Fill in your API keys
+
+# Run development server
+npm run dev
+```
+
+### Get Test Tokens
+
+1. **Test ETH** (for gas): https://www.alchemy.com/faucets/base-sepolia
+2. **Test USDC**: https://faucet.circle.com (select Base Sepolia)
 
 ---
 
 ## Deployment
 
-### Vercel (Recommended)
+### Vercel (Frontend)
 
 1. Push to GitHub
-2. Import repo at [vercel.com](https://vercel.com)
-3. Add environment variables:
-   - `NEXT_PUBLIC_TMDB_API_KEY`
-   - `GEMINI_API_KEY`
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+2. Import at [vercel.com](https://vercel.com)
+3. Add all environment variables
 4. Deploy!
+
+### Smart Contract (Base Sepolia)
+
+```bash
+cd contracts
+npm install
+npx hardhat run scripts/deploy.ts --network baseSepolia
+```
 
 ---
 
-## Sponsor Integrations
+## Hackathon Submission
 
-| Sponsor | Integration |
-|---------|-------------|
-| **TV5 Monde** | French content from 8 Francophone regions |
-| **Google AI** | Gemini powers vocabulary, quizzes, chatbot |
-| **YouTube** | Trailer player with French captions |
-| **Supabase** | Cloud database for user progress |
+### Google AI Hackathon 2025
+
+**Track:** AI Agents / Creative AI
+
+**Google Technologies Used:**
+- **Veo 2** - AI video generation from text prompts
+- **Gemini 2.5 Flash** - Vocabulary generation, quiz creation, AI judging, chatbot
+- **Vertex AI** - Cloud AI platform for Veo deployment
+- **Firebase** - Authentication (optional)
+
+**Problem Solved:**
+Traditional language learning is boring. CineLingua makes it engaging by:
+1. Using cinema as the learning medium
+2. Letting users CREATE content, not just consume it
+3. Adding competition and real monetary stakes
+4. Providing AI tutoring personalized to each learner
+
+**Innovation:**
+- First platform to combine AI video generation with language learning
+- Gamified creation contests with blockchain-verified prizes
+- AI judges provide educational feedback, not just scores
+
+---
+
+## Demo Video
+
+[Link to YouTube demo] - Coming soon
+
+---
+
+## Screenshots
+
+| Learn | Contest | Studio |
+|-------|---------|--------|
+| Browse movies & vocabulary | Create AI scenes | Manage your videos |
+
+---
+
+## Team
+
+Built by **Sebastian** for Google AI Hackathon 2025
 
 ---
 
 ## License
 
-MIT License - Built for Agentics TV5 Hackathon 2025
+MIT License
 
 ---
 
-**Made with ❤️ for the Agentics TV5 Hackathon 2025**
+## Links
 
-*Learn French. Watch Movies. Compete. Level Up!*
+- **Live App:** https://cine-lingua.vercel.app
+- **GitHub:** https://github.com/superbigroach/CineLingua
+- **Contract:** https://sepolia.basescan.org/address/0x567aFe456ceCA40e108Edf3DF72D8b190C542A0f
+
+---
+
+**Made with ❤️ using Google AI**
+
+*Learn Languages. Create Scenes. Win Prizes.*
