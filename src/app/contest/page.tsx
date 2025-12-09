@@ -142,7 +142,7 @@ export default function ContestPage() {
       <SparkleBackground />
       <NavBar userAvatar={user?.avatar} />
 
-      <div className="pt-28 relative z-10">
+      <div className="pt-6 relative z-10">
         {!selectedMovie ? (
           /* MOVIE SELECTION */
           <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-8">

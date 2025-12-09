@@ -25,7 +25,10 @@ export default function NavBar({ user, onLeaderboard, onInvite }: NavBarProps) {
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 h-14 bg-[#08080c]/95 backdrop-blur-xl border-b border-white/[0.04]">
+    <>
+    {/* Spacer to prevent content from going under fixed navbar */}
+    <div className="h-14" />
+    <nav className="fixed top-0 left-0 right-0 z-50 h-14 bg-[#08080c] border-b border-white/[0.06]">
       <div className="max-w-[1800px] mx-auto px-4 h-full flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5">
@@ -119,5 +122,6 @@ export default function NavBar({ user, onLeaderboard, onInvite }: NavBarProps) {
         </div>
       </div>
     </nav>
+    </>
   );
 }

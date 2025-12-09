@@ -190,7 +190,7 @@ export default function WalletPage() {
       <SparkleBackground />
       <NavBar />
 
-      <div className="pt-28 max-w-3xl mx-auto px-4 sm:px-6 py-8 relative z-10">
+      <div className="pt-6 max-w-3xl mx-auto px-4 sm:px-6 py-8 relative z-10">
         {/* Header */}
         <div className="text-center mb-10">
           <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-4">
