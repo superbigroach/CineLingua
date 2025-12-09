@@ -3,27 +3,20 @@
 import { useState, useEffect } from 'react';
 import NavBar from '@/components/NavBar';
 import SparkleBackground from '@/components/SparkleBackground';
+import {
+  CONTRACT_ADDRESS,
+  USDC_ADDRESS,
+  BASE_SEPOLIA_CHAIN,
+  connectWallet as connectWalletLib,
+  getUSDCBalance,
+  getETHBalance,
+  switchToBaseSepolia,
+} from '@/lib/contract';
 
 const GENERATION_COST = 2.40;  // 3x 8-sec clips @ $0.80 each
 const STAKE_TO_POOL = 1.90;    // Goes to prize pool
 const PLATFORM_FEE = 0.50;     // Platform fee
 const TOTAL_TO_COMPETE = GENERATION_COST + STAKE_TO_POOL + PLATFORM_FEE; // $4.80
-
-// Base Sepolia testnet config
-const BASE_SEPOLIA_CONFIG = {
-  chainId: '0x14a34', // 84532 in hex
-  chainName: 'Base Sepolia',
-  nativeCurrency: {
-    name: 'Ethereum',
-    symbol: 'ETH',
-    decimals: 18,
-  },
-  rpcUrls: ['https://sepolia.base.org'],
-  blockExplorerUrls: ['https://sepolia.basescan.org'],
-};
-
-// USDC on Base Sepolia
-const USDC_ADDRESS = '0x036CbD53842c5426634e7929541eC2318f3dCF7e';
 
 // Faucet links
 const FAUCETS = [
@@ -451,7 +444,18 @@ export default function WalletPage() {
             </div>
             <div className="flex justify-between">
               <span className="text-white/50">Contest Contract</span>
-              <span className="text-white/30 italic text-xs">Deploy with Hardhat</span>
+              {CONTRACT_ADDRESS ? (
+                <a
+                  href={`https://sepolia.basescan.org/address/${CONTRACT_ADDRESS}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-cyan-400 hover:underline font-mono text-xs"
+                >
+                  {shortenAddress(CONTRACT_ADDRESS)}
+                </a>
+              ) : (
+                <span className="text-amber-400 text-xs">Not deployed yet</span>
+              )}
             </div>
           </div>
         </div>
