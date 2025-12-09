@@ -1,37 +1,88 @@
-// Google Veo Video Generation API
+// Google Veo 3.1 Video Generation API
 // https://cloud.google.com/vertex-ai/generative-ai/pricing
 //
 // Official Pricing (Dec 2025):
-// - Veo 3.1 Fast (video only): $0.10/second  <-- Best value, we use this
-// - Veo 3.1 Fast (video+audio): $0.15/second
-// - Veo 3.1 (video only): $0.20/second
-// - Veo 3.1 (video+audio): $0.40/second
-// - Veo 3 (video only): $0.20/second
-// - Veo 3 (video+audio): $0.40/second
+// - Veo 3.1 Fast (video only): $0.15/second     <-- Tier A
+// - Veo 3.1 Fast (video+audio): $0.40/second
+// - Veo 3.1 Standard (video only): $0.40/second <-- Tier B & C
+// - Veo 3.1 Standard (video+audio): $0.55/second
 //
-// Supported: 720p, 1080p output
+// Supported: 720p, 1080p output, up to 60 seconds
+// Veo 3.1 offers superior quality, better motion, and frame consistency
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { TIERS } from './contract';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
-// Cost constants - using Veo 3.1 Fast (video only) for best value
-export const VEO_MODEL = 'veo-3.1-fast';
-export const VEO_COST_PER_SECOND = 0.10; // USD - Veo 3.1 Fast video-only
-export const VIDEO_DURATION_SECONDS = 8;
-export const VIDEO_RESOLUTION = '720p';
-export const TOTAL_GENERATION_COST = VEO_COST_PER_SECOND * VIDEO_DURATION_SECONDS; // $0.80 per 8-sec clip
+// ===========================================
+// VEO 3.1 MODEL CONFIGURATIONS
+// ===========================================
 
-// Contest economics
-// Stake = 2x generation cost = $1.60
-// Total to enter contest = generation ($0.80) + stake ($1.60) = $2.40
-export const CONTEST_STAKE_MULTIPLIER = 2; // Stake is 2x the generation cost
-export const MINIMUM_STAKE = TOTAL_GENERATION_COST * CONTEST_STAKE_MULTIPLIER; // $1.60
-export const PLATFORM_FEE_PERCENTAGE = 0.20; // 20% of prize pool (taken from winnings)
+// Tier A - Veo 3.1 Fast
+export const VEO_FAST_MODEL = 'veo-3.1-fast-generate-001';
+export const VEO_FAST_COST_PER_SECOND = 0.15; // USD
+
+// Tier B/C - Veo 3.1 Standard
+export const VEO_STANDARD_MODEL = 'veo-3.1-generate-001';
+export const VEO_STANDARD_COST_PER_SECOND = 0.40; // USD
+
+// Video settings
+export const VIDEO_DURATION_SECONDS = 24; // Total duration
+export const CLIP_DURATION = 8; // Each clip is 8 seconds
+export const VIDEO_RESOLUTION = '1080p';
+
+// Get model config by tier
+export function getVeoModelConfig(tier: number) {
+  switch (tier) {
+    case 0: // Fast
+      return {
+        model: VEO_FAST_MODEL,
+        costPerSec: VEO_FAST_COST_PER_SECOND,
+        clips: 3,
+        clipDuration: 8,
+        totalDuration: 24,
+        quality: 'Good',
+        description: 'Veo 3.1 Fast - 3× 8-second clips',
+      };
+    case 1: // Standard
+      return {
+        model: VEO_STANDARD_MODEL,
+        costPerSec: VEO_STANDARD_COST_PER_SECOND,
+        clips: 3,
+        clipDuration: 8,
+        totalDuration: 24,
+        quality: 'Excellent',
+        description: 'Veo 3.1 Standard - 3× 8-second clips',
+      };
+    case 2: // Premium (single 24-sec generation)
+      return {
+        model: VEO_STANDARD_MODEL,
+        costPerSec: VEO_STANDARD_COST_PER_SECOND,
+        clips: 1,
+        clipDuration: 24,
+        totalDuration: 24,
+        quality: 'Best',
+        description: 'Veo 3.1 Standard - 1× 24-second seamless clip',
+      };
+    default:
+      return getVeoModelConfig(0);
+  }
+}
+
+// Calculate generation cost for a tier
+export function calculateGenerationCost(tier: number): number {
+  const config = getVeoModelConfig(tier);
+  return config.costPerSec * config.totalDuration;
+}
+
+// Prize distribution (5 winners)
 export const PRIZE_SPLIT = {
-  first: 0.50,   // 50% of 80% = 40% of total pool
-  second: 0.30,  // 30% of 80% = 24% of total pool
-  third: 0.20,   // 20% of 80% = 16% of total pool
+  first: 0.50,   // 50%
+  second: 0.20,  // 20%
+  third: 0.10,   // 10%
+  fourth: 0.10,  // 10%
+  fifth: 0.10,   // 10%
 };
 
 export interface ScenePrompt {
@@ -56,6 +107,7 @@ export interface GeneratedVideo {
   duration: number;
   prompt: string;
   variation: number;
+  tier: number;
 }
 
 export interface ContestSubmission {
@@ -65,6 +117,7 @@ export interface ContestSubmission {
   enhancedPrompt: EnhancedPrompt;
   videos: GeneratedVideo[];
   selectedVideoId: string;
+  tier: number;
   stakeAmount: number;
   generationCost: number;
   createdAt: Date;
@@ -112,14 +165,19 @@ const STYLE_PRESETS = {
 
 // Enhance user prompt into cinematic Veo-ready prompt
 export async function enhancePromptForVeo(
-  scenePrompt: ScenePrompt
+  scenePrompt: ScenePrompt,
+  tier: number = 0
 ): Promise<EnhancedPrompt> {
   const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
   const style = STYLE_PRESETS[scenePrompt.style || 'drama'];
+  const veoConfig = getVeoModelConfig(tier);
+
+  const clipCount = veoConfig.clips;
+  const clipDuration = veoConfig.clipDuration;
 
   const prompt = `You are a world-class cinematographer and screenwriter creating prompts for AI video generation.
 
-TASK: Transform this user's scene idea into 3 cinematic video generation prompts.
+TASK: Transform this user's scene idea into ${clipCount} cinematic video generation prompt${clipCount > 1 ? 's' : ''}.
 
 USER'S SCENE IDEA: "${scenePrompt.userPrompt}"
 
@@ -127,6 +185,11 @@ REQUIRED WORDS/PHRASES (must appear naturally in the scene):
 ${scenePrompt.requiredWords.map(w => `- ${w}`).join('\n')}
 
 TARGET LANGUAGE: ${scenePrompt.language}
+
+VIDEO SPECIFICATIONS:
+- ${clipCount} clip${clipCount > 1 ? 's' : ''} of ${clipDuration} seconds each
+- Total duration: ${veoConfig.totalDuration} seconds
+- Quality tier: ${veoConfig.quality}
 
 VISUAL STYLE GUIDELINES:
 - Lighting: ${style.lighting}
@@ -136,11 +199,11 @@ VISUAL STYLE GUIDELINES:
 
 Create a JSON response with:
 {
-  "cinematicPrompt": "Main detailed 8-second scene description with specific visual details, camera movements, lighting, and atmosphere. Include the required words naturally.",
+  "cinematicPrompt": "Main detailed ${clipDuration}-second scene description with specific visual details, camera movements, lighting, and atmosphere. Include the required words naturally.",
   "variations": [
-    "Variation 1: Same scene but different camera angle or time of day",
+    ${clipCount > 1 ? `"Variation 1: Same scene but different camera angle or time of day",
     "Variation 2: Same scene but different emotional beat or weather",
-    "Variation 3: Same scene but different character action or reveal"
+    "Variation 3: Same scene but different character action or reveal"` : `"Single seamless 24-second scene with narrative progression"`}
   ],
   "visualStyle": "Brief style summary",
   "cameraDirections": "Specific camera movements and framing",
@@ -153,7 +216,7 @@ IMPORTANT:
 - Include camera movement directions (pan, track, push in, etc.)
 - Describe the scene as if directing a cinematographer
 - Ensure required ${scenePrompt.language} words appear naturally
-- Make each variation distinct but coherent`;
+${clipCount > 1 ? '- Make each variation distinct but coherent' : '- Create a single flowing narrative with beginning, middle, and end'}`;
 
   const result = await model.generateContent(prompt);
   const text = result.response.text();
@@ -166,7 +229,9 @@ IMPORTANT:
   // Fallback if parsing fails
   return {
     cinematicPrompt: scenePrompt.userPrompt,
-    variations: [scenePrompt.userPrompt, scenePrompt.userPrompt, scenePrompt.userPrompt],
+    variations: clipCount > 1
+      ? [scenePrompt.userPrompt, scenePrompt.userPrompt, scenePrompt.userPrompt]
+      : [scenePrompt.userPrompt],
     visualStyle: 'Cinematic',
     cameraDirections: 'Slow push in',
     mood: 'Atmospheric',
@@ -182,7 +247,6 @@ export function validatePromptContainsWords(
   const missing: string[] = [];
 
   for (const word of requiredWords) {
-    // Check for word or close variations
     const wordLower = word.toLowerCase();
     if (!promptLower.includes(wordLower)) {
       missing.push(word);
@@ -198,15 +262,12 @@ export function validatePromptContainsWords(
 // Vertex AI configuration
 const VERTEX_PROJECT_ID = process.env.GOOGLE_CLOUD_PROJECT || '';
 const VERTEX_LOCATION = process.env.VERTEX_AI_LOCATION || 'us-central1';
-const VEO_MODEL_ID = 'veo-2.0-generate-001'; // Veo 2 model
 
 // Get access token from service account or ADC
 async function getAccessToken(): Promise<string> {
-  // Check for service account JSON credentials
   const serviceAccountJson = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
 
   if (serviceAccountJson) {
-    // Parse service account credentials and generate JWT
     const credentials = JSON.parse(serviceAccountJson);
     const jwt = await generateServiceAccountJWT(credentials);
     return jwt;
@@ -245,13 +306,11 @@ async function generateServiceAccountJWT(credentials: {
     scope: 'https://www.googleapis.com/auth/cloud-platform',
   };
 
-  // Create the JWT
   const encoder = new TextEncoder();
   const headerB64 = btoa(JSON.stringify(header)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
   const payloadB64 = btoa(JSON.stringify(payload)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
   const signatureInput = `${headerB64}.${payloadB64}`;
 
-  // Sign with private key using Web Crypto API
   const privateKey = await crypto.subtle.importKey(
     'pkcs8',
     pemToArrayBuffer(credentials.private_key),
@@ -271,7 +330,6 @@ async function generateServiceAccountJWT(credentials: {
 
   const jwt = `${signatureInput}.${signatureB64}`;
 
-  // Exchange JWT for access token
   const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -308,12 +366,14 @@ export interface VeoGenerationJob {
   operationName: string;
   estimatedTime: number;
   status: 'pending' | 'processing' | 'completed' | 'failed';
+  tier: number;
 }
 
-// Generate video using Veo 2 API (via Vertex AI)
+// Generate video using Veo 3.1 API (via Vertex AI)
 export async function generateVideoWithVeo(
   prompt: string,
   options: {
+    tier?: number;
     duration?: number;
     aspectRatio?: '16:9' | '9:16' | '1:1';
     resolution?: '720p' | '1080p';
@@ -324,10 +384,14 @@ export async function generateVideoWithVeo(
     throw new Error('GOOGLE_CLOUD_PROJECT environment variable not set');
   }
 
+  const tier = options.tier ?? 0;
+  const veoConfig = getVeoModelConfig(tier);
+  const modelId = veoConfig.model;
+
   const accessToken = await getAccessToken();
 
   // Vertex AI Veo endpoint
-  const endpoint = `https://${VERTEX_LOCATION}-aiplatform.googleapis.com/v1/projects/${VERTEX_PROJECT_ID}/locations/${VERTEX_LOCATION}/publishers/google/models/${VEO_MODEL_ID}:generateVideo`;
+  const endpoint = `https://${VERTEX_LOCATION}-aiplatform.googleapis.com/v1/projects/${VERTEX_PROJECT_ID}/locations/${VERTEX_LOCATION}/publishers/google/models/${modelId}:generateVideo`;
 
   const requestBody = {
     instances: [{
@@ -335,16 +399,18 @@ export async function generateVideoWithVeo(
     }],
     parameters: {
       aspectRatio: options.aspectRatio || '16:9',
-      durationSeconds: options.duration || VIDEO_DURATION_SECONDS,
-      resolution: options.resolution || '720p',
+      durationSeconds: options.duration || veoConfig.clipDuration,
+      resolution: options.resolution || VIDEO_RESOLUTION,
       ...(options.negativePrompt && { negativePrompt: options.negativePrompt }),
     },
   };
 
   console.log('Veo Generation Request:', {
     endpoint,
+    model: modelId,
+    tier: tier,
     prompt: prompt.substring(0, 100) + '...',
-    duration: options.duration || VIDEO_DURATION_SECONDS,
+    duration: options.duration || veoConfig.clipDuration,
     aspectRatio: options.aspectRatio || '16:9',
   });
 
@@ -365,15 +431,15 @@ export async function generateVideoWithVeo(
 
   const result = await response.json();
 
-  // Veo returns a long-running operation
   const operationName = result.name || result.operationName;
   const jobId = `veo_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
   return {
     jobId,
     operationName,
-    estimatedTime: 180, // Veo typically takes 2-5 minutes
+    estimatedTime: tier === 2 ? 300 : 180, // Premium takes longer
     status: 'pending',
+    tier,
   };
 }
 
@@ -393,7 +459,6 @@ export async function checkVeoJobStatus(
 
   const accessToken = await getAccessToken();
 
-  // Poll the long-running operation
   const endpoint = `https://${VERTEX_LOCATION}-aiplatform.googleapis.com/v1/${operationName}`;
 
   const response = await fetch(endpoint, {
@@ -414,7 +479,6 @@ export async function checkVeoJobStatus(
 
   const result = await response.json();
 
-  // Check if operation is done
   if (result.done) {
     if (result.error) {
       return {
@@ -423,7 +487,6 @@ export async function checkVeoJobStatus(
       };
     }
 
-    // Extract video URL from response
     const videos = result.response?.generatedVideos || result.response?.videos || [];
     if (videos.length > 0) {
       const video = videos[0];
@@ -441,7 +504,6 @@ export async function checkVeoJobStatus(
     };
   }
 
-  // Still processing
   const metadata = result.metadata || {};
   return {
     status: 'processing',
@@ -452,61 +514,31 @@ export async function checkVeoJobStatus(
 // Download video from GCS and get a temporary signed URL
 export async function getVideoDownloadUrl(gcsUri: string): Promise<string> {
   if (!gcsUri.startsWith('gs://')) {
-    return gcsUri; // Already a URL
+    return gcsUri;
   }
 
-  const accessToken = await getAccessToken();
-
-  // Parse GCS URI: gs://bucket/path/to/file
   const match = gcsUri.match(/^gs:\/\/([^\/]+)\/(.+)$/);
   if (!match) {
     throw new Error(`Invalid GCS URI: ${gcsUri}`);
   }
 
-  const [, bucket, object] = match;
-  const encodedObject = encodeURIComponent(object);
-
-  // Generate signed URL using the storage API
-  const endpoint = `https://storage.googleapis.com/storage/v1/b/${bucket}/o/${encodedObject}?alt=media`;
-
-  // For now, return a proxy URL through our API
-  // In production, you'd generate a signed URL
   return `/api/video/proxy?uri=${encodeURIComponent(gcsUri)}`;
 }
 
 // Calculate costs for a submission
-export function calculateSubmissionCost(options: {
-  generateOnly: boolean;
-  stakeMultiplier?: number;
-}): {
+export function calculateSubmissionCost(tier: number): {
   generationCost: number;
-  stakeCost: number;
   platformFee: number;
-  prizePoolContribution: number;
+  poolContribution: number;
   total: number;
 } {
-  const generationCost = TOTAL_GENERATION_COST;
-
-  if (options.generateOnly) {
-    return {
-      generationCost,
-      stakeCost: 0,
-      platformFee: 0,
-      prizePoolContribution: 0,
-      total: generationCost,
-    };
-  }
-
-  const stakeCost = generationCost * (options.stakeMultiplier || 1);
-  const platformFee = stakeCost * PLATFORM_FEE_PERCENTAGE;
-  const prizePoolContribution = stakeCost - platformFee;
+  const tierConfig = TIERS[tier] || TIERS[0];
 
   return {
-    generationCost,
-    stakeCost,
-    platformFee,
-    prizePoolContribution,
-    total: generationCost + stakeCost,
+    generationCost: tierConfig.genCost / 1_000_000,
+    platformFee: 0.40,
+    poolContribution: tierConfig.poolContribution / 1_000_000,
+    total: tierConfig.entry / 1_000_000,
   };
 }
 
@@ -515,16 +547,16 @@ export interface JudgeScore {
   judgeId: 'cinematographer' | 'linguist' | 'audience';
   judgeName: string;
   judgeEmoji: string;
-  score: number; // 1-10
+  score: number;
   feedback: string;
   criteria: string[];
 }
 
 const JUDGE_PERSONAS = {
   cinematographer: {
-    name: 'Le Cinéaste',
+    name: 'Le Cineaste',
     emoji: '🎬',
-    personality: 'A legendary French film director who has won multiple César Awards. Extremely particular about mise-en-scène, lighting, and visual storytelling. Speaks with authority but appreciates bold choices.',
+    personality: 'A legendary French film director who has won multiple Cesar Awards. Extremely particular about mise-en-scene, lighting, and visual storytelling. Speaks with authority but appreciates bold choices.',
     criteria: [
       'Visual composition and framing',
       'Lighting and atmosphere',
@@ -536,7 +568,7 @@ const JUDGE_PERSONAS = {
   linguist: {
     name: 'Le Linguiste',
     emoji: '🗣️',
-    personality: 'A distinguished member of the Académie Française, passionate about preserving and celebrating the French language. Values authentic usage, cultural accuracy, and natural integration of vocabulary.',
+    personality: 'A distinguished member of the Academie Francaise, passionate about preserving and celebrating the French language. Values authentic usage, cultural accuracy, and natural integration of vocabulary.',
     criteria: [
       'Natural integration of required vocabulary',
       'Cultural authenticity',
@@ -566,10 +598,12 @@ export async function judgeSubmission(
     requiredWords: string[];
     language: string;
     videoDescription: string;
+    tier: number;
   }
 ): Promise<JudgeScore[]> {
   const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
   const scores: JudgeScore[] = [];
+  const tierConfig = getVeoModelConfig(submission.tier);
 
   for (const [judgeId, judge] of Object.entries(JUDGE_PERSONAS)) {
     const prompt = `You are ${judge.name}, ${judge.personality}
@@ -579,6 +613,7 @@ You are judging a video submission for a ${submission.language} language learnin
 SCENE PROMPT: "${submission.prompt}"
 REQUIRED ${submission.language.toUpperCase()} WORDS USED: ${submission.requiredWords.join(', ')}
 VIDEO DESCRIPTION: "${submission.videoDescription}"
+VIDEO QUALITY TIER: ${tierConfig.quality} (${tierConfig.description})
 
 YOUR JUDGING CRITERIA:
 ${judge.criteria.map((c, i) => `${i + 1}. ${c}`).join('\n')}
@@ -615,5 +650,5 @@ Provide your judgment in JSON format. Be fair but critical - not everyone gets a
 export function calculateFinalScore(scores: JudgeScore[]): number {
   if (scores.length === 0) return 0;
   const total = scores.reduce((sum, s) => sum + s.score, 0);
-  return total; // Max 30 points (3 judges × 10 points each)
+  return total; // Max 30 points (3 judges x 10 points each)
 }

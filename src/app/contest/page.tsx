@@ -6,6 +6,7 @@ import Image from 'next/image';
 import NavBar from '@/components/NavBar';
 import SparkleBackground from '@/components/SparkleBackground';
 import { getCurrentUser } from '@/lib/userStore';
+import { TIERS, PRIZE_SPLIT } from '@/lib/contract';
 
 interface ContestMovie {
   id: number;
@@ -24,6 +25,7 @@ interface Submission {
   prompt: string;
   thumbnailUrl: string;
   score: number | null;
+  tier: number;
   createdAt: string;
 }
 
@@ -37,10 +39,10 @@ interface ChatMessage {
 
 // This week's contest movies (verified TMDB poster paths)
 const CONTEST_MOVIES: ContestMovie[] = [
-  { id: 194, title: 'Amélie', originalTitle: 'Le Fabuleux Destin d\'Amélie Poulain', year: 2001, posterPath: '/vZ9NhNbQQ3yhtiC5sbhpy5KTXns.jpg', language: 'French', theme: 'Whimsical Paris' },
+  { id: 194, title: 'Amelie', originalTitle: 'Le Fabuleux Destin d\'Amelie Poulain', year: 2001, posterPath: '/vZ9NhNbQQ3yhtiC5sbhpy5KTXns.jpg', language: 'French', theme: 'Whimsical Paris' },
   { id: 77338, title: 'The Intouchables', originalTitle: 'Intouchables', year: 2011, posterPath: '/i97FM40bOMKvKIo3hjQviETE5yf.jpg', language: 'French', theme: 'Unlikely Friendship' },
   { id: 406, title: 'La Haine', originalTitle: 'La Haine', year: 1995, posterPath: '/8rgPyWjYZhsphSSxbXguMnhN7H0.jpg', language: 'French', theme: 'Urban Tension' },
-  { id: 152584, title: 'Blue Is the Warmest Color', originalTitle: 'La Vie d\'Adèle', year: 2013, posterPath: '/kgUk1wti2cvrptIgUz0VTAtSF6w.jpg', language: 'French', theme: 'Passion & Identity' },
+  { id: 152584, title: 'Blue Is the Warmest Color', originalTitle: 'La Vie d\'Adele', year: 2013, posterPath: '/kgUk1wti2cvrptIgUz0VTAtSF6w.jpg', language: 'French', theme: 'Passion & Identity' },
   { id: 489925, title: 'Portrait of a Lady on Fire', originalTitle: 'Portrait de la jeune fille en feu', year: 2019, posterPath: '/2LquGwEhbg3soxSCs9VNyh5VJd9.jpg', language: 'French', theme: 'Art & Desire' },
 ];
 
@@ -67,10 +69,107 @@ function MoviePoster({ posterPath, title, className }: { posterPath: string; tit
   );
 }
 
+// Tier Selection Component
+function TierSelector({ selectedTier, onSelectTier }: { selectedTier: number; onSelectTier: (tier: number) => void }) {
+  const tierColors = [
+    { bg: 'from-emerald-500/20 to-emerald-600/10', border: 'border-emerald-500/40', text: 'text-emerald-400', badge: 'bg-emerald-500' },
+    { bg: 'from-purple-500/20 to-purple-600/10', border: 'border-purple-500/40', text: 'text-purple-400', badge: 'bg-purple-500' },
+    { bg: 'from-amber-500/20 to-amber-600/10', border: 'border-amber-500/40', text: 'text-amber-400', badge: 'bg-amber-500' },
+  ];
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {TIERS.map((tier, idx) => {
+        const colors = tierColors[idx];
+        const isSelected = selectedTier === tier.id;
+
+        return (
+          <button
+            key={tier.id}
+            onClick={() => onSelectTier(tier.id)}
+            className={`relative p-4 rounded-xl border-2 transition-all ${
+              isSelected
+                ? `bg-gradient-to-br ${colors.bg} ${colors.border} scale-[1.02]`
+                : 'bg-white/[0.02] border-white/10 hover:border-white/20'
+            }`}
+          >
+            {/* Badge */}
+            <div className={`absolute -top-2 -right-2 px-2 py-0.5 rounded-full text-xs font-bold text-white ${colors.badge}`}>
+              {tier.quality}
+            </div>
+
+            {/* Tier Name & Price */}
+            <div className="text-center mb-3">
+              <h3 className={`text-xl font-bold ${isSelected ? colors.text : 'text-white'}`}>
+                {tier.name}
+              </h3>
+              <p className="text-2xl font-bold text-white mt-1">
+                ${(tier.entry / 1_000_000).toFixed(2)}
+              </p>
+            </div>
+
+            {/* Details */}
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-white/50">Model</span>
+                <span className="text-white/80">Veo 3.1 {tier.name}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-white/50">Video</span>
+                <span className="text-white/80">{tier.clips}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-white/50">To Pool</span>
+                <span className={isSelected ? colors.text : 'text-cyan-400'}>
+                  ${(tier.poolContribution / 1_000_000).toFixed(2)}
+                </span>
+              </div>
+            </div>
+
+            {/* Description */}
+            <p className="mt-3 text-xs text-white/40 text-center">
+              {tier.description}
+            </p>
+
+            {/* Selected indicator */}
+            {isSelected && (
+              <div className={`absolute -bottom-1 left-1/2 -translate-x-1/2 w-8 h-1 rounded-full ${colors.badge}`} />
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// Prize Distribution Display
+function PrizeDistribution() {
+  const prizes = [
+    { place: '1st', emoji: '🥇', percent: PRIZE_SPLIT.first * 100, color: 'text-amber-400' },
+    { place: '2nd', emoji: '🥈', percent: PRIZE_SPLIT.second * 100, color: 'text-gray-300' },
+    { place: '3rd', emoji: '🥉', percent: PRIZE_SPLIT.third * 100, color: 'text-amber-600' },
+    { place: '4th', emoji: '🎬', percent: PRIZE_SPLIT.fourth * 100, color: 'text-purple-400' },
+    { place: '5th', emoji: '🎬', percent: PRIZE_SPLIT.fifth * 100, color: 'text-cyan-400' },
+  ];
+
+  return (
+    <div className="flex justify-center gap-3 flex-wrap">
+      {prizes.map((prize) => (
+        <div key={prize.place} className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 rounded-lg">
+          <span className="text-lg">{prize.emoji}</span>
+          <span className="text-white/60 text-sm">{prize.place}</span>
+          <span className={`font-bold ${prize.color}`}>{prize.percent}%</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function ContestPage() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [selectedMovie, setSelectedMovie] = useState<ContestMovie | null>(null);
+  const [selectedTier, setSelectedTier] = useState(0);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
@@ -135,6 +234,8 @@ export default function ContestPage() {
     return new Date(ts).toLocaleDateString();
   }
 
+  const currentTier = TIERS[selectedTier];
+
   if (!user) return <div className="min-h-screen bg-[#08080c] flex items-center justify-center"><div className="w-10 h-10 border-2 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" /></div>;
 
   return (
@@ -152,7 +253,14 @@ export default function ContestPage() {
                 Week {Math.ceil(new Date().getDate() / 7)} Active
               </div>
               <h1 className="text-4xl font-bold text-white mb-2">This Week's Contest</h1>
-              <p className="text-white/50 mb-6">Pick a movie to enter</p>
+              <p className="text-white/50 mb-6">Pick a movie, choose your tier, create your scene!</p>
+
+              {/* Prize Distribution */}
+              <div className="mb-6">
+                <p className="text-white/40 text-sm mb-2">5 Winners Split the Pool</p>
+                <PrizeDistribution />
+              </div>
+
               <div className="flex justify-center">
                 <div><p className="text-2xl font-bold text-white">{timeRemaining}</p><p className="text-white/40 text-sm">Remaining</p></div>
               </div>
@@ -170,7 +278,7 @@ export default function ContestPage() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-3">
                       <h3 className="text-white font-bold text-sm">{movie.title}</h3>
-                      <p className="text-white/50 text-xs">{movie.year} • {movie.language}</p>
+                      <p className="text-white/50 text-xs">{movie.year} * {movie.language}</p>
                     </div>
                   </div>
                 </button>
@@ -195,11 +303,24 @@ export default function ContestPage() {
               </div>
               <div className="flex-1">
                 <h1 className="text-2xl font-bold text-white">{selectedMovie.title}</h1>
-                <p className="text-white/50 text-sm mb-4">{selectedMovie.theme} • {selectedMovie.language} • {selectedMovie.year}</p>
+                <p className="text-white/50 text-sm mb-4">{selectedMovie.theme} * {selectedMovie.language} * {selectedMovie.year}</p>
                 <div className="flex flex-wrap gap-3">
                   <div className="px-3 py-2 bg-white/[0.04] rounded-lg"><p className="text-lg font-bold text-white">{submissions.length}</p><p className="text-white/40 text-xs">Entries</p></div>
                   <div className="px-3 py-2 bg-white/[0.04] rounded-lg"><p className="text-lg font-bold text-cyan-400">{timeRemaining}</p><p className="text-white/40 text-xs">Left</p></div>
                 </div>
+              </div>
+            </div>
+
+            {/* Tier Selection */}
+            <div className="bg-gradient-to-r from-purple-500/5 via-cyan-500/5 to-emerald-500/5 rounded-2xl border border-white/10 p-6 mb-6">
+              <h2 className="text-lg font-bold text-white mb-2 text-center">Choose Your Tier</h2>
+              <p className="text-white/40 text-sm text-center mb-4">Higher tiers = better video quality. All tiers generate 24 seconds of video.</p>
+              <TierSelector selectedTier={selectedTier} onSelectTier={setSelectedTier} />
+
+              {/* Prize Info */}
+              <div className="mt-6 pt-4 border-t border-white/10">
+                <p className="text-white/40 text-sm text-center mb-2">5 Winners Split the Prize Pool</p>
+                <PrizeDistribution />
               </div>
             </div>
 
@@ -221,7 +342,7 @@ export default function ContestPage() {
 
                 {/* Step 2: Create Scene */}
                 <button
-                  onClick={() => router.push(`/?movie=${selectedMovie.id}&action=create`)}
+                  onClick={() => router.push(`/?movie=${selectedMovie.id}&action=create&tier=${selectedTier}`)}
                   className="group p-4 bg-white/5 hover:bg-cyan-500/20 rounded-xl border border-white/10 hover:border-cyan-500/40 transition-all text-center"
                 >
                   <div className="w-12 h-12 mx-auto rounded-full bg-cyan-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
@@ -233,14 +354,14 @@ export default function ContestPage() {
 
                 {/* Step 3: Generate Video */}
                 <button
-                  onClick={() => router.push(`/?movie=${selectedMovie.id}&action=generate`)}
+                  onClick={() => router.push(`/?movie=${selectedMovie.id}&action=generate&tier=${selectedTier}`)}
                   className="group p-4 bg-white/5 hover:bg-orange-500/20 rounded-xl border border-white/10 hover:border-orange-500/40 transition-all text-center"
                 >
                   <div className="w-12 h-12 mx-auto rounded-full bg-orange-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                     <span className="text-2xl">3</span>
                   </div>
                   <h3 className="font-bold text-white text-sm mb-1">Generate</h3>
-                  <p className="text-white/40 text-xs">3x 8-sec clips</p>
+                  <p className="text-white/40 text-xs">{currentTier.clips}</p>
                 </button>
 
                 {/* Step 4: Submit & Pay */}
@@ -252,11 +373,11 @@ export default function ContestPage() {
                     <span className="text-2xl">4</span>
                   </div>
                   <h3 className="font-bold text-white text-sm mb-1">Submit</h3>
-                  <p className="text-white/40 text-xs">$2.40 USDC</p>
+                  <p className="text-white/40 text-xs">${(currentTier.entry / 1_000_000).toFixed(2)} USDC</p>
                 </button>
               </div>
               <p className="text-center text-white/30 text-xs mt-4">
-                $2.40 entry → 100% to prize pool • Platform takes 20% from winnings • Top 3 split remaining 80%
+                ${(currentTier.entry / 1_000_000).toFixed(2)} entry: ${(currentTier.poolContribution / 1_000_000).toFixed(2)} to prize pool + ${(currentTier.entry / 2_000_000).toFixed(2)} platform fee (covers generation)
               </p>
             </div>
 
@@ -280,8 +401,11 @@ export default function ContestPage() {
                       <div key={sub.id} className="bg-black/30 rounded-lg overflow-hidden border border-white/[0.06]">
                         <div className="aspect-video relative">
                           <img src={sub.thumbnailUrl} alt="" className="w-full h-full object-cover" />
-                          {idx < 3 && <div className="absolute top-2 left-2 text-lg">{['🥇','🥈','🥉'][idx]}</div>}
+                          {idx < 5 && <div className="absolute top-2 left-2 text-lg">{['🥇','🥈','🥉','🎬','🎬'][idx]}</div>}
                           {sub.score && <div className="absolute top-2 right-2 px-2 py-0.5 bg-black/60 rounded text-white text-xs font-bold">{sub.score}</div>}
+                          <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-black/60 rounded text-white/60 text-xs">
+                            {TIERS[sub.tier]?.name || 'Fast'}
+                          </div>
                         </div>
                         <div className="p-3">
                           <div className="flex items-center gap-2 mb-1">

@@ -4,12 +4,12 @@
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-cine--lingua.vercel.app-cyan)](https://cine-lingua.vercel.app)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org)
-[![Google Veo](https://img.shields.io/badge/Google-Veo%202-blue)](https://cloud.google.com/vertex-ai)
-[![Gemini](https://img.shields.io/badge/Google-Gemini%202.5-purple)](https://ai.google.dev)
+[![Google Veo 3.1](https://img.shields.io/badge/Google-Veo%203.1-blue)](https://cloud.google.com/vertex-ai)
+[![Gemini 2.5](https://img.shields.io/badge/Google-Gemini%202.5-purple)](https://ai.google.dev)
 [![Base](https://img.shields.io/badge/Base-Sepolia-0052FF)](https://base.org)
 [![Supabase](https://img.shields.io/badge/Supabase-Database-green)](https://supabase.com)
 
-An AI-powered language learning platform that combines cinema, AI video generation, and Web3 contests. Watch trailers, learn vocabulary, create AI-generated movie scenes with **Google Veo 2**, compete in weekly contests, and win **USDC prizes** on Base blockchain!
+An AI-powered language learning platform that combines cinema, AI video generation, and Web3 contests. Watch trailers, learn vocabulary, create AI-generated movie scenes with **Google Veo 3.1**, compete in weekly contests, win **USDC prizes**, and earn **NFT awards** on Base blockchain!
 
 ## Live Demo
 
@@ -21,10 +21,11 @@ An AI-powered language learning platform that combines cinema, AI video generati
 
 | Feature | Technology | Description |
 |---------|------------|-------------|
-| **AI Video Generation** | Google Veo 2 | Create 8-second cinematic scenes from text prompts |
+| **AI Video Generation** | Google Veo 3.1 | Create stunning 1080p cinematic scenes from text prompts |
 | **Smart Vocabulary** | Google Gemini 2.5 | AI-generated vocabulary, quizzes, and tutoring |
 | **Weekly Contests** | Base Blockchain | Compete for USDC prize pools with smart contracts |
-| **AI Judges** | Gemini-powered | Three AI judges score submissions: Cinematographer, Linguist, Audience |
+| **AI Judges** | Gemini 2.5 Flash | Three AI judges score with video analysis |
+| **NFT Awards** | On-chain SVG | Animated NFT trophies for all participants |
 | **Crypto Wallet** | Circle & MetaMask | Manage USDC earnings and contest entries |
 
 ---
@@ -51,31 +52,86 @@ CineLingua/
 4. Take quizzes and practice with flashcards
 5. Chat with AI tutor for personalized help
 
-### 2. Create & Compete ($4.80 entry)
+### 2. Create & Compete (3 Tiers Available)
 1. **Take Quiz** → Unlock vocabulary "ingredients"
 2. **Write Scene** → Craft a prompt using unlocked words
-3. **Generate Video** → Veo 2 creates your 8-second scene
-4. **Submit** → Enter the weekly contest
+3. **Choose Tier** → Select Fast ($8), Standard ($20), or Premium ($20) video quality
+4. **Generate Video** → Veo 3.1 creates your 1080p scene (24 seconds total)
+5. **Submit** → Enter the weekly contest
 
-### 3. Win Prizes
-- **AI Judging** → Three judges score your submission (max 30 points)
+### 3. Win Prizes + NFT Awards
+- **AI Judging** → Three AI judges analyze your video and score (max 30 points)
 - **Live Show** → Winners announced in weekly livestream
-- **Prize Split**: 1st (50%) | 2nd (30%) | 3rd (20%)
+- **5 Winners**: 1st (50%) | 2nd (20%) | 3rd (10%) | 4th (10%) | 5th (10%)
+- **NFT Awards** → Every participant gets an animated on-chain NFT!
 
 ---
 
 ## Contest Economics
 
-| Cost Breakdown | Amount |
-|----------------|--------|
-| Video Generation (Veo 2) | $2.40 |
-| Prize Pool Stake | $1.90 |
-| Platform Fee | $0.50 |
-| **Total Entry** | **$4.80 USDC** |
+### Entry Tiers
 
-**Prize Distribution:**
-- 80% → Winners pool (split 50/30/20)
-- 20% → Platform fee
+| Tier | Entry Fee | Veo Model | Video Output | Pool Contribution |
+|------|-----------|-----------|--------------|-------------------|
+| ⚡ **Fast** | $8.00 USDC | Veo 3.1 Fast | 3× 8-sec clips | $4.00 |
+| 🎬 **Standard** | $20.00 USDC | Veo 3.1 Standard | 3× 8-sec clips | $10.00 |
+| ✨ **Premium** | $20.00 USDC | Veo 3.1 Standard | 1× 24-sec seamless | $10.00 |
+
+**How It Works:**
+- Entry fee = Platform fee ($0.40) + Generation cost, then doubled
+- Half your entry goes to the prize pool, half covers generation + platform fee
+- 5 winners split 100% of the prize pool!
+
+### Prize Distribution (5 Winners)
+
+| Place | Share | Example ($100 pool) |
+|-------|-------|---------------------|
+| 🥇 **1st** | 50% | $50.00 |
+| 🥈 **2nd** | 20% | $20.00 |
+| 🥉 **3rd** | 10% | $10.00 |
+| 🎬 **4th** | 10% | $10.00 |
+| 🎬 **5th** | 10% | $10.00 |
+
+---
+
+## NFT Awards System
+
+Every contest participant earns an animated NFT trophy!
+
+| Tier | Award | Description |
+|------|-------|-------------|
+| 🥇 **1st Place** | Gold Trophy | Animated gold trophy with score |
+| 🥈 **2nd Place** | Silver Trophy | Animated silver trophy with score |
+| 🥉 **3rd Place** | Bronze Trophy | Animated bronze trophy with score |
+| 🎬 **4th/5th Place** | Film Medal | Animated medal for top 5 finish |
+| 🎬 **Participant** | Film Badge | Animated badge for entering |
+| 👑 **Grand Champion** | Platinum Crown | Season winner special edition |
+
+**NFT Features:**
+- On-chain SVG generation (no external hosting)
+- Animated film reel aesthetic with shine effects
+- Film grain overlay animation
+- Score display showing AI judge ratings
+- Movie title and contest theme
+- Video thumbnail integration
+
+**NFT Contract:** `0x5E70D149E496eda49Ad2E65ec46d9418f44a7883` ([View on BaseScan](https://sepolia.basescan.org/address/0x5E70D149E496eda49Ad2E65ec46d9418f44a7883))
+
+---
+
+## AI Judges
+
+Three AI personas powered by Gemini 2.5 Flash analyze and score each video:
+
+| Judge | Focus | Criteria |
+|-------|-------|----------|
+| **Le Cinéaste** 🎬 | Visual Quality | Composition, lighting, camera work, mood |
+| **Le Linguiste** 🗣️ | Language Use | Vocabulary integration, cultural authenticity |
+| **Le Public** 🎭 | Entertainment | Creativity, emotional impact, memorability |
+
+**Scoring:** Each judge scores 1-10 after analyzing your video. Maximum total: **30 points**.
+
+**Video Analysis:** Judges can watch up to 1 hour of video (2GB max) - your 24-second scenes are perfect!
 
 ---
 
@@ -85,56 +141,57 @@ CineLingua/
 - **Next.js 16** - React framework with App Router
 - **TypeScript** - Type-safe development
 - **Tailwind CSS** - Utility-first styling
-- **ethers.js** - Blockchain interactions
+- **ethers.js / viem** - Blockchain interactions
 
 ### AI & Video
-- **Google Veo 2** - AI video generation (Vertex AI)
-- **Google Gemini 2.5 Flash** - Vocabulary, quizzes, judging, chat
+- **Google Veo 3.1** - AI video generation (1080p, Fast & Standard models)
+- **Google Gemini 2.5 Flash** - Vocabulary, quizzes, video judging, chat
+- **Vertex AI** - Cloud AI platform
 - **Web Speech API** - Text-to-speech pronunciation
 
 ### Blockchain
 - **Base Sepolia** - Testnet for smart contracts
-- **Solidity** - Smart contract language
+- **Solidity** - Smart contract language (OpenZeppelin)
 - **USDC** - Stablecoin for payments
+- **ERC-721** - NFT standard for awards
 - **Hardhat** - Contract development & deployment
 
 ### Backend & Data
-- **Supabase** - PostgreSQL database
+- **Supabase** - PostgreSQL database + Storage
 - **TMDB API** - Movie metadata & posters
 - **YouTube API** - Trailer embedding
 - **Circle** - Wallet infrastructure
 
 ---
 
-## Smart Contract
+## Smart Contracts
 
-**CineSceneContest.sol** - Deployed on Base Sepolia
+### CineSceneContest.sol
+Main contest contract for entries, scoring, and prize distribution.
 
 | Function | Description |
 |----------|-------------|
-| `submitEntry()` | Submit contest entry with USDC stake |
+| `submitEntryWithTier()` | Submit contest entry with tier selection (0=Fast, 1=Standard, 2=Premium) |
 | `updateVideoHash()` | Link generated video to entry |
-| `setScores()` | Admin sets AI judge scores |
+| `submitScores()` | Admin sets AI judge scores |
+| `finalizeContest()` | Calculate prizes for 5 winners with tie handling |
 | `claimPrize()` | Winners claim their rewards |
-| `withdrawFees()` | Platform withdraws fees |
+| `withdrawPlatformRevenue()` | Platform withdraws accumulated revenue |
 
-**Contract Address:** `0x567aFe456ceCA40e108Edf3DF72D8b190C542A0f`
+**Contract Address:** `0x48368BA4c399bEb9130A7B58D4A2Ce2ce280cafa`
 
-**View on BaseScan:** [Contract Link](https://sepolia.basescan.org/address/0x567aFe456ceCA40e108Edf3DF72D8b190C542A0f)
+**View on BaseScan:** [Contract Link](https://sepolia.basescan.org/address/0x48368BA4c399bEb9130A7B58D4A2Ce2ce280cafa)
 
----
+### CineSceneNFT.sol
+ERC-721 NFT contract for participant awards.
 
-## AI Judges
+| Function | Description |
+|----------|-------------|
+| `mintAward()` | Mint single NFT to participant |
+| `batchMintParticipants()` | Batch mint for all contestants |
+| `tokenURI()` | Returns on-chain SVG metadata |
 
-Three AI personas powered by Gemini score each submission:
-
-| Judge | Focus | Criteria |
-|-------|-------|----------|
-| **Le Cinéaste** 🎬 | Visual Quality | Composition, lighting, camera work, mood |
-| **Le Linguiste** 🗣️ | Language Use | Vocabulary integration, cultural authenticity |
-| **Le Public** 🎭 | Entertainment | Creativity, emotional impact, memorability |
-
-Each judge scores 1-10. Maximum total: **30 points**.
+**Contract Address:** `0x5E70D149E496eda49Ad2E65ec46d9418f44a7883`
 
 ---
 
@@ -149,34 +206,33 @@ cinelingua/
 │   │   ├── contest/page.tsx         # Contest - Weekly competitions
 │   │   ├── wallet/page.tsx          # Wallet - USDC & transactions
 │   │   ├── about/page.tsx           # Info - About the platform
-│   │   ├── login/page.tsx           # Authentication
 │   │   └── api/
 │   │       ├── video/generate/      # Veo video generation
-│   │       ├── scene-challenge/     # Contest logic & judging
+│   │       ├── judge/               # AI judging endpoint
+│   │       ├── nft/mint/            # NFT minting API
 │   │       ├── chat/                # AI tutor chatbot
-│   │       ├── learn/               # Vocabulary generation
-│   │       ├── movies/              # TMDB integration
-│   │       └── wallet/              # Circle wallet API
+│   │       └── movies/              # TMDB integration
 │   ├── components/
 │   │   ├── SceneCreatorModal.tsx    # Video prompt builder
 │   │   ├── JudgingShowModal.tsx     # Live judging display
 │   │   ├── QuizModal.tsx            # Vocabulary quizzes
-│   │   ├── FlashcardModal.tsx       # Swipeable flashcards
-│   │   ├── ChatbotModal.tsx         # AI conversation
 │   │   └── NavBar.tsx               # Navigation
 │   └── lib/
-│       ├── veo.ts                   # Google Veo integration
-│       ├── contract.ts              # Smart contract helpers
-│       ├── sceneChallenge.ts        # Contest logic
-│       ├── circle.ts                # Circle wallet
-│       ├── supabase.ts              # Database client
-│       └── gemini.ts                # AI prompts
+│       ├── veo.ts                   # Google Veo 3 integration
+│       ├── aiJudges.ts              # AI judging system
+│       ├── contract.ts              # Contest contract helpers
+│       ├── nftContract.ts           # NFT contract helpers
+│       ├── videoStorage.ts          # Supabase video storage
+│       └── supabase.ts              # Database client
 ├── contracts/
-│   ├── CineSceneContest.sol         # Main contest contract
-│   ├── scripts/deploy.ts            # Deployment script
-│   └── hardhat.config.ts            # Hardhat configuration
-├── supabase-schema.sql              # Database schema
-└── supabase-schema-contests.sql     # Contest tables
+│   ├── contracts/
+│   │   ├── CineSceneContest.sol     # Main contest contract
+│   │   └── CineSceneNFT.sol         # NFT awards contract
+│   ├── scripts/
+│   │   ├── deploy.js                # Contest deployment
+│   │   └── deploy-nft.js            # NFT deployment
+│   └── hardhat.config.js            # Hardhat configuration
+└── supabase-schema.sql              # Database schema
 ```
 
 ---
@@ -184,7 +240,7 @@ cinelingua/
 ## Environment Variables
 
 ```env
-# Google Cloud / Vertex AI (Veo)
+# Google Cloud / Vertex AI (Veo 3)
 GOOGLE_CLOUD_PROJECT=your-project-id
 GOOGLE_APPLICATION_CREDENTIALS_JSON={"type":"service_account",...}
 VERTEX_AI_LOCATION=us-central1
@@ -199,15 +255,14 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 # TMDB
 NEXT_PUBLIC_TMDB_API_KEY=your-tmdb-key
 
-# Smart Contract (Base Sepolia)
-NEXT_PUBLIC_CONTEST_CONTRACT=0x567aFe456ceCA40e108Edf3DF72D8b190C542A0f
+# Smart Contracts (Base Sepolia)
+NEXT_PUBLIC_CONTEST_CONTRACT=0x48368BA4c399bEb9130A7B58D4A2Ce2ce280cafa
+NEXT_PUBLIC_NFT_CONTRACT=0x5E70D149E496eda49Ad2E65ec46d9418f44a7883
 DEPLOYER_PRIVATE_KEY=0x...  # Only for deployment
 BASESCAN_API_KEY=your-key   # For verification
 
-# Circle (Wallet)
-CIRCLE_TESTNET_API_KEY=your-key
-CIRCLE_WALLET_SET_ID=your-wallet-set
-NEXT_PUBLIC_CIRCLE_CLIENT_URL=https://...
+# Revenue
+REVENUE_WALLET=0x...  # Platform fee recipient
 ```
 
 ---
@@ -253,12 +308,17 @@ npm run dev
 3. Add all environment variables
 4. Deploy!
 
-### Smart Contract (Base Sepolia)
+### Smart Contracts (Base Sepolia)
 
 ```bash
 cd contracts
 npm install
-npx hardhat run scripts/deploy.ts --network baseSepolia
+
+# Deploy Contest Contract
+npx hardhat run scripts/deploy.js --network base-sepolia
+
+# Deploy NFT Contract
+npx hardhat run scripts/deploy-nft.js --network base-sepolia
 ```
 
 ---
@@ -270,21 +330,23 @@ npx hardhat run scripts/deploy.ts --network baseSepolia
 **Track:** AI Agents / Creative AI
 
 **Google Technologies Used:**
-- **Veo 2** - AI video generation from text prompts
-- **Gemini 2.5 Flash** - Vocabulary generation, quiz creation, AI judging, chatbot
+- **Veo 3.1** - AI video generation from text prompts (1080p quality, Fast & Standard models)
+- **Gemini 2.5 Flash** - Vocabulary generation, quiz creation, video analysis judging, chatbot
 - **Vertex AI** - Cloud AI platform for Veo deployment
-- **Firebase** - Authentication (optional)
 
 **Problem Solved:**
 Traditional language learning is boring. CineLingua makes it engaging by:
 1. Using cinema as the learning medium
 2. Letting users CREATE content, not just consume it
-3. Adding competition and real monetary stakes
+3. Adding competition with real monetary stakes
 4. Providing AI tutoring personalized to each learner
+5. Awarding collectible NFTs to commemorate achievements
 
 **Innovation:**
 - First platform to combine AI video generation with language learning
+- AI judges that actually WATCH and analyze generated videos
 - Gamified creation contests with blockchain-verified prizes
+- On-chain animated NFT awards for all participants
 - AI judges provide educational feedback, not just scores
 
 ---
@@ -297,9 +359,9 @@ Traditional language learning is boring. CineLingua makes it engaging by:
 
 ## Screenshots
 
-| Learn | Contest | Studio |
-|-------|---------|--------|
-| Browse movies & vocabulary | Create AI scenes | Manage your videos |
+| Learn | Contest | NFT Awards |
+|-------|---------|------------|
+| Browse movies & vocabulary | Create AI scenes | Earn animated trophies |
 
 ---
 
@@ -319,10 +381,11 @@ MIT License
 
 - **Live App:** https://cine-lingua.vercel.app
 - **GitHub:** https://github.com/superbigroach/CineLingua
-- **Contract:** https://sepolia.basescan.org/address/0x567aFe456ceCA40e108Edf3DF72D8b190C542A0f
+- **Contest Contract:** https://sepolia.basescan.org/address/0x48368BA4c399bEb9130A7B58D4A2Ce2ce280cafa
+- **NFT Contract:** https://sepolia.basescan.org/address/0x5E70D149E496eda49Ad2E65ec46d9418f44a7883
 
 ---
 
-**Made with ❤️ using Google AI**
+**Made with Google AI, Base Network & Supabase**
 
-*Learn Languages. Create Scenes. Win Prizes.*
+*Learn Languages. Create Scenes. Win Prizes. Earn NFTs.*

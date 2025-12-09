@@ -9,22 +9,26 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 /**
  * @title CineSceneContest
  * @notice Weekly AI video scene contest with USDC stakes on Base network
- * @dev Users stake USDC to enter, AI judges score, top 3 split the prize pool
+ * @dev Users stake USDC to enter, AI judges score, top 5 split the prize pool
  *
- * Flow:
- * 1. Admin creates a weekly contest with theme
- * 2. Users submit entries by staking USDC (100% goes to prize pool)
- * 3. At contest end, admin submits AI judge scores
- * 4. Platform takes 20% from the TOTAL prize pool as service fee
- * 5. Remaining 80% is distributed to winners (50% / 30% / 20% split)
- * 6. Ties are handled by splitting the combined prize equally
+ * NEW PRICING MODEL (Dec 2025):
+ * - User pays: Platform Fee ($0.40) + Generation Cost + Stake (equal to fee + cost)
+ * - Half goes to platform (covers generation + fee), half goes to prize pool
+ * - 3 Tiers available: Fast ($8), Standard ($20), Premium ($20 single-gen)
+ *
+ * Prize Distribution (5 winners):
+ * - 1st place: 50%
+ * - 2nd place: 20%
+ * - 3rd place: 10%
+ * - 4th place: 10%
+ * - 5th place: 10%
  *
  * Example with $100 prize pool:
- *   - Platform fee: $20 (20%)
- *   - Winners pool: $80 (80%)
- *   - 1st place: $40 (50% of $80)
- *   - 2nd place: $24 (30% of $80)
- *   - 3rd place: $16 (20% of $80)
+ *   - 1st place: $50
+ *   - 2nd place: $20
+ *   - 3rd place: $10
+ *   - 4th place: $10
+ *   - 5th place: $10
  */
 contract CineSceneContest is Ownable, ReentrancyGuard {
     using SafeERC20 for IERC20;
@@ -33,37 +37,49 @@ contract CineSceneContest is Ownable, ReentrancyGuard {
     // USDC on Base Sepolia testnet: 0x036CbD53842c5426634e7929541eC2318f3dCF7e
     IERC20 public immutable usdc;
 
-    // Platform economics
-    uint256 public constant PLATFORM_FEE_BPS = 2000; // 20% of prize pool taken from winnings
-    uint256 public constant BPS_DENOMINATOR = 10000;
+    // Platform fee: $0.40 (400000 in USDC 6 decimals)
+    uint256 public constant PLATFORM_FEE = 400_000; // $0.40
 
-    // Pricing based on Google Veo 3.1 Fast ($0.10/second, video only)
-    // 3x 8-second videos = 24 seconds per scene = $2.40 generation cost
-    // Minimum stake = generation cost = $2.40 (2_400_000 in USDC 6 decimals)
-    uint256 public constant DEFAULT_MIN_STAKE = 2_400_000; // $2.40 USDC (6 decimals)
+    // Pricing Tiers (24 seconds of video):
+    // Tier A - Veo 3.1 Fast: $0.15/sec × 24 = $3.60 generation
+    // Tier B - Veo 3.1 Standard: $0.40/sec × 24 = $9.60 generation
+    // Tier C - Veo 3.1 Single (premium): Same as Standard but single 24-sec generation
+
+    // Entry costs = (Platform Fee + Generation Cost) × 2
+    // Half to platform (fee + generation), half to prize pool
+    uint256 public constant TIER_A_ENTRY = 8_000_000;   // $8.00 (Fast tier)
+    uint256 public constant TIER_B_ENTRY = 20_000_000;  // $20.00 (Standard tier)
+    uint256 public constant TIER_C_ENTRY = 20_000_000;  // $20.00 (Premium single-gen)
+
+    // Default minimum stake for backwards compatibility
+    uint256 public constant DEFAULT_MIN_STAKE = 8_000_000; // $8.00 (Tier A)
 
     // Judging delay - 30 minutes after contest ends before judging can begin
-    // This gives time for all participants to watch the live judging show
     uint256 public constant JUDGING_DELAY = 30 minutes;
 
-    // Prize distribution (basis points) - applied to 80% of pool after platform fee
-    uint256 public constant FIRST_PLACE_BPS = 5000;  // 50% of winners pool
-    uint256 public constant SECOND_PLACE_BPS = 3000; // 30% of winners pool
-    uint256 public constant THIRD_PLACE_BPS = 2000;  // 20% of winners pool
+    // Prize distribution (basis points) - 5 winners
+    uint256 public constant FIRST_PLACE_BPS = 5000;   // 50%
+    uint256 public constant SECOND_PLACE_BPS = 2000;  // 20%
+    uint256 public constant THIRD_PLACE_BPS = 1000;   // 10%
+    uint256 public constant FOURTH_PLACE_BPS = 1000;  // 10%
+    uint256 public constant FIFTH_PLACE_BPS = 1000;   // 10%
+    uint256 public constant BPS_DENOMINATOR = 10000;
+
+    // Number of winners
+    uint256 public constant WINNER_COUNT = 5;
 
     struct Contest {
         uint256 id;
         string theme;           // e.g., "French Film Noir", "Romantic Paris"
         string language;        // e.g., "French", "Spanish"
         uint256 minStake;       // Minimum USDC to enter (6 decimals)
-        uint256 prizePool;      // Total prize pool (all stakes go here)
-        uint256 winnersPool;    // Prize pool after 20% platform fee (set at finalization)
-        uint256 platformFees;   // 20% of prize pool (set at finalization)
+        uint256 prizePool;      // Prize pool (stakes from entries)
+        uint256 platformRevenue;// Platform revenue (fees + generation costs)
         uint256 startTime;
         uint256 endTime;
         uint256 judgingStartTime; // When judging show begins (endTime + 30 min)
         bool finalized;
-        bool feesWithdrawn;
+        bool revenueWithdrawn;
         uint256 entryCount;
     }
 
@@ -73,8 +89,10 @@ contract CineSceneContest is Ownable, ReentrancyGuard {
         string movieTitle;
         string promptHash;      // IPFS hash of the full prompt
         string videoHash;       // IPFS hash of generated video
-        uint256 stakeAmount;
-        uint256 score;          // Combined AI judge score (0-30, scaled by 100 for decimals)
+        uint256 stakeAmount;    // Full entry amount paid
+        uint256 poolContribution; // Amount that went to prize pool
+        uint8 tier;             // 0=Fast, 1=Standard, 2=Premium
+        uint256 score;          // Combined AI judge score (0-30, scaled by 100)
         uint256 timestamp;
         bool claimed;
     }
@@ -94,12 +112,12 @@ contract CineSceneContest is Ownable, ReentrancyGuard {
 
     // Events
     event ContestCreated(uint256 indexed contestId, string theme, string language, uint256 minStake, uint256 endTime);
-    event EntrySubmitted(uint256 indexed contestId, uint256 indexed entryId, address indexed user, uint256 stakeAmount);
+    event EntrySubmitted(uint256 indexed contestId, uint256 indexed entryId, address indexed user, uint256 stakeAmount, uint8 tier, uint256 poolContribution);
     event ScoresSubmitted(uint256 indexed contestId, uint256 entryId, uint256 score);
     event JudgingShowStarted(uint256 indexed contestId, uint256 timestamp);
     event ContestFinalized(uint256 indexed contestId, uint256[] winnerEntryIds);
     event PrizeClaimed(uint256 indexed contestId, uint256 indexed entryId, address indexed user, uint256 amount);
-    event PlatformFeesWithdrawn(uint256 indexed contestId, uint256 amount);
+    event PlatformRevenueWithdrawn(uint256 indexed contestId, uint256 amount);
 
     constructor(address _usdc) Ownable(msg.sender) {
         usdc = IERC20(_usdc);
@@ -113,7 +131,7 @@ contract CineSceneContest is Ownable, ReentrancyGuard {
      * @notice Create a new weekly contest
      * @param theme The visual/creative theme for this week
      * @param language Target language (French, Spanish, etc.)
-     * @param minStake Minimum USDC stake to enter (6 decimals, e.g., 2800000 = $2.80)
+     * @param minStake Minimum USDC stake to enter (6 decimals)
      * @param duration Contest duration in seconds (e.g., 7 days = 604800)
      */
     function createContest(
@@ -132,13 +150,12 @@ contract CineSceneContest is Ownable, ReentrancyGuard {
             language: language,
             minStake: minStake,
             prizePool: 0,
-            winnersPool: 0,
-            platformFees: 0,
+            platformRevenue: 0,
             startTime: block.timestamp,
             endTime: contestEndTime,
-            judgingStartTime: contestEndTime + JUDGING_DELAY, // 30 min after end
+            judgingStartTime: contestEndTime + JUDGING_DELAY,
             finalized: false,
-            feesWithdrawn: false,
+            revenueWithdrawn: false,
             entryCount: 0
         });
 
@@ -168,9 +185,7 @@ contract CineSceneContest is Ownable, ReentrancyGuard {
 
     /**
      * @notice Finalize contest and determine winners
-     * @dev Takes 20% platform fee from prize pool, distributes 80% to winners
-     *      Handles ties by splitting combined prizes equally
-     *      Can only be called 30 minutes after contest ends (after judging show)
+     * @dev Top 5 winners split the prize pool (50/20/10/10/10)
      */
     function finalizeContest(uint256 contestId) external onlyOwner {
         Contest storage contest = contests[contestId];
@@ -178,17 +193,10 @@ contract CineSceneContest is Ownable, ReentrancyGuard {
         require(!contest.finalized, "Already finalized");
         require(contest.entryCount > 0, "No entries");
 
-        // Calculate platform fee (20% of total prize pool)
-        uint256 platformFee = (contest.prizePool * PLATFORM_FEE_BPS) / BPS_DENOMINATOR;
-        uint256 winnersPool = contest.prizePool - platformFee;
-
-        contest.platformFees = platformFee;
-        contest.winnersPool = winnersPool;
-
         // Sort entries by score (simple bubble sort for small arrays)
         uint256[] memory sortedIds = _getSortedEntryIds(contestId, contest.entryCount);
 
-        // Handle ties and assign prizes
+        // Get top 5 winners (or fewer if less entries)
         uint256[] memory winnerIds = _assignWinnersWithTies(contestId, sortedIds);
         contestWinners[contestId] = winnerIds;
 
@@ -197,20 +205,19 @@ contract CineSceneContest is Ownable, ReentrancyGuard {
     }
 
     /**
-     * @notice Withdraw platform fees (20% of prize pool)
-     * @dev Can only be called after contest is finalized
+     * @notice Withdraw platform revenue (fees + generation costs)
      */
-    function withdrawPlatformFees(uint256 contestId) external onlyOwner {
+    function withdrawPlatformRevenue(uint256 contestId) external onlyOwner {
         Contest storage contest = contests[contestId];
         require(contest.finalized, "Not finalized");
-        require(!contest.feesWithdrawn, "Fees already withdrawn");
-        uint256 fees = contest.platformFees;
-        require(fees > 0, "No fees");
+        require(!contest.revenueWithdrawn, "Already withdrawn");
+        uint256 revenue = contest.platformRevenue;
+        require(revenue > 0, "No revenue");
 
-        contest.feesWithdrawn = true;
-        usdc.safeTransfer(owner(), fees);
+        contest.revenueWithdrawn = true;
+        usdc.safeTransfer(owner(), revenue);
 
-        emit PlatformFeesWithdrawn(contestId, fees);
+        emit PlatformRevenueWithdrawn(contestId, revenue);
     }
 
     // ============================================
@@ -218,11 +225,66 @@ contract CineSceneContest is Ownable, ReentrancyGuard {
     // ============================================
 
     /**
-     * @notice Submit an entry to a contest
+     * @notice Submit an entry to a contest with tier selection
      * @param contestId The contest to enter
      * @param movieTitle Movie the scene is based on
      * @param promptHash IPFS hash of the scene prompt
-     * @param stakeAmount Amount of USDC to stake (must be >= minStake)
+     * @param tier 0=Fast($8), 1=Standard($20), 2=Premium($20)
+     */
+    function submitEntryWithTier(
+        uint256 contestId,
+        string calldata movieTitle,
+        string calldata promptHash,
+        uint8 tier
+    ) external nonReentrant returns (uint256 entryId) {
+        require(tier <= 2, "Invalid tier");
+
+        uint256 entryAmount;
+        if (tier == 0) {
+            entryAmount = TIER_A_ENTRY;  // $8.00
+        } else {
+            entryAmount = TIER_B_ENTRY;  // $20.00 (both Standard and Premium)
+        }
+
+        Contest storage contest = contests[contestId];
+        require(block.timestamp < contest.endTime, "Contest ended");
+        require(entryAmount >= contest.minStake, "Below min stake");
+        require(userEntries[msg.sender][contestId] == 0, "Already entered");
+
+        // Transfer USDC from user
+        usdc.safeTransferFrom(msg.sender, address(this), entryAmount);
+
+        // Split: half to prize pool, half to platform
+        uint256 poolContribution = entryAmount / 2;
+        uint256 platformShare = entryAmount - poolContribution;
+
+        contest.prizePool += poolContribution;
+        contest.platformRevenue += platformShare;
+        contest.entryCount++;
+
+        entryId = contest.entryCount;
+
+        entries[contestId][entryId] = Entry({
+            user: msg.sender,
+            contestId: contestId,
+            movieTitle: movieTitle,
+            promptHash: promptHash,
+            videoHash: "",
+            stakeAmount: entryAmount,
+            poolContribution: poolContribution,
+            tier: tier,
+            score: 0,
+            timestamp: block.timestamp,
+            claimed: false
+        });
+
+        userEntries[msg.sender][contestId] = entryId;
+
+        emit EntrySubmitted(contestId, entryId, msg.sender, entryAmount, tier, poolContribution);
+    }
+
+    /**
+     * @notice Legacy submit entry (defaults to Tier A - Fast)
      */
     function submitEntry(
         uint256 contestId,
@@ -238,8 +300,12 @@ contract CineSceneContest is Ownable, ReentrancyGuard {
         // Transfer USDC from user
         usdc.safeTransferFrom(msg.sender, address(this), stakeAmount);
 
-        // 100% goes to prize pool - platform fee taken from winnings at finalization
-        contest.prizePool += stakeAmount;
+        // Split: half to prize pool, half to platform
+        uint256 poolContribution = stakeAmount / 2;
+        uint256 platformShare = stakeAmount - poolContribution;
+
+        contest.prizePool += poolContribution;
+        contest.platformRevenue += platformShare;
         contest.entryCount++;
 
         entryId = contest.entryCount;
@@ -251,6 +317,8 @@ contract CineSceneContest is Ownable, ReentrancyGuard {
             promptHash: promptHash,
             videoHash: "",
             stakeAmount: stakeAmount,
+            poolContribution: poolContribution,
+            tier: 0, // Default to Fast tier
             score: 0,
             timestamp: block.timestamp,
             claimed: false
@@ -258,7 +326,7 @@ contract CineSceneContest is Ownable, ReentrancyGuard {
 
         userEntries[msg.sender][contestId] = entryId;
 
-        emit EntrySubmitted(contestId, entryId, msg.sender, stakeAmount);
+        emit EntrySubmitted(contestId, entryId, msg.sender, stakeAmount, 0, poolContribution);
     }
 
     /**
@@ -329,18 +397,11 @@ contract CineSceneContest is Ownable, ReentrancyGuard {
                !contest.finalized;
     }
 
-    /**
-     * @notice Check if the judging show can start (30 min after contest ends)
-     */
     function canStartJudging(uint256 contestId) external view returns (bool) {
         Contest storage contest = contests[contestId];
         return block.timestamp >= contest.judgingStartTime && !contest.finalized;
     }
 
-    /**
-     * @notice Get time until judging show starts
-     * @return seconds until judging (0 if already started or contest not ended)
-     */
     function timeUntilJudging(uint256 contestId) external view returns (uint256) {
         Contest storage contest = contests[contestId];
         if (block.timestamp >= contest.judgingStartTime) return 0;
@@ -348,9 +409,6 @@ contract CineSceneContest is Ownable, ReentrancyGuard {
         return contest.judgingStartTime - block.timestamp;
     }
 
-    /**
-     * @notice Get contest status as string
-     */
     function getContestStatus(uint256 contestId) external view returns (string memory) {
         Contest storage contest = contests[contestId];
 
@@ -359,6 +417,18 @@ contract CineSceneContest is Ownable, ReentrancyGuard {
         if (block.timestamp < contest.endTime) return "active";
         if (block.timestamp < contest.judgingStartTime) return "awaiting_judging";
         return "judging";
+    }
+
+    /**
+     * @notice Get tier pricing info
+     */
+    function getTierPricing() external pure returns (
+        uint256 tierAEntry,
+        uint256 tierBEntry,
+        uint256 tierCEntry,
+        uint256 platformFee
+    ) {
+        return (TIER_A_ENTRY, TIER_B_ENTRY, TIER_C_ENTRY, PLATFORM_FEE);
     }
 
     // ============================================
@@ -387,10 +457,7 @@ contract CineSceneContest is Ownable, ReentrancyGuard {
     }
 
     /**
-     * @notice Assign winners handling ties
-     * @dev If there's a tie for 1st, those entries split 1st+2nd prize
-     *      If there's a tie for 2nd, those entries split 2nd+3rd prize
-     *      etc.
+     * @notice Assign winners handling ties - now supports 5 winners
      */
     function _assignWinnersWithTies(
         uint256 contestId,
@@ -398,8 +465,8 @@ contract CineSceneContest is Ownable, ReentrancyGuard {
     ) internal view returns (uint256[] memory) {
         if (sortedIds.length == 0) return new uint256[](0);
 
-        // For simplicity, return top 3 (or fewer if less entries)
-        uint256 winnerCount = sortedIds.length < 3 ? sortedIds.length : 3;
+        // Return top 5 (or fewer if less entries)
+        uint256 winnerCount = sortedIds.length < WINNER_COUNT ? sortedIds.length : WINNER_COUNT;
         uint256[] memory winners = new uint256[](winnerCount);
 
         for (uint256 i = 0; i < winnerCount; i++) {
@@ -410,8 +477,7 @@ contract CineSceneContest is Ownable, ReentrancyGuard {
     }
 
     /**
-     * @notice Calculate prize for an entry, handling ties
-     * @dev Uses winnersPool (80% of total) not prizePool (100%)
+     * @notice Calculate prize for an entry - 5 winner distribution
      */
     function _calculatePrize(
         uint256 contestId,
@@ -443,6 +509,8 @@ contract CineSceneContest is Ownable, ReentrancyGuard {
                 if (i == 0) combinedPrizeBps += FIRST_PLACE_BPS;
                 else if (i == 1) combinedPrizeBps += SECOND_PLACE_BPS;
                 else if (i == 2) combinedPrizeBps += THIRD_PLACE_BPS;
+                else if (i == 3) combinedPrizeBps += FOURTH_PLACE_BPS;
+                else if (i == 4) combinedPrizeBps += FIFTH_PLACE_BPS;
             }
         }
 
@@ -460,8 +528,7 @@ contract CineSceneContest is Ownable, ReentrancyGuard {
         if (!isWinner) return 0;
 
         // Split combined prize equally among tied entries
-        // Use winnersPool (80%) not prizePool (100%) - platform already took 20%
-        uint256 totalPrize = (contest.winnersPool * combinedPrizeBps) / BPS_DENOMINATOR;
+        uint256 totalPrize = (contest.prizePool * combinedPrizeBps) / BPS_DENOMINATOR;
         return totalPrize / tieCount;
     }
 }
