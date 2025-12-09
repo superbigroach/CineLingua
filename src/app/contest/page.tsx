@@ -35,12 +35,12 @@ interface ChatMessage {
   timestamp: string;
 }
 
-// This week's contest movies (real TMDB data, no fake numbers)
+// This week's contest movies (verified TMDB poster paths)
 const CONTEST_MOVIES: ContestMovie[] = [
-  { id: 194, title: 'Amélie', originalTitle: 'Le Fabuleux Destin d\'Amélie Poulain', year: 2001, posterPath: '/nSxDa3ppafARKqWDLoQ7k4PwfGW.jpg', language: 'French', theme: 'Whimsical Paris' },
-  { id: 77338, title: 'The Intouchables', originalTitle: 'Intouchables', year: 2011, posterPath: '/323BP0itpxTsO0skTwdnVmgJHIh.jpg', language: 'French', theme: 'Unlikely Friendship' },
-  { id: 11860, title: 'La Haine', originalTitle: 'La Haine', year: 1995, posterPath: '/1lGIrNLIE0GgqD1bJDLuaVXiSw1.jpg', language: 'French', theme: 'Urban Tension' },
-  { id: 152532, title: 'Blue Is the Warmest Color', originalTitle: 'La Vie d\'Adèle', year: 2013, posterPath: '/uyaFYhnqMKwU1F0wxmZkNlFfbwJ.jpg', language: 'French', theme: 'Passion & Identity' },
+  { id: 194, title: 'Amélie', originalTitle: 'Le Fabuleux Destin d\'Amélie Poulain', year: 2001, posterPath: '/f0uorE7K7ggHfr8r7pUTOHWkOlE.jpg', language: 'French', theme: 'Whimsical Paris' },
+  { id: 77338, title: 'The Intouchables', originalTitle: 'Intouchables', year: 2011, posterPath: '/4mFsNQwbD0F237Tx7gAPotSpBXj.jpg', language: 'French', theme: 'Unlikely Friendship' },
+  { id: 11860, title: 'La Haine', originalTitle: 'La Haine', year: 1995, posterPath: '/aKHFEt9k0ldbmzOOXVr7YqMINVZ.jpg', language: 'French', theme: 'Urban Tension' },
+  { id: 152532, title: 'Blue Is the Warmest Color', originalTitle: 'La Vie d\'Adèle', year: 2013, posterPath: '/pUbxHNHfyxB2IvjoYGiNnfXqcwQ.jpg', language: 'French', theme: 'Passion & Identity' },
   { id: 489925, title: 'Portrait of a Lady on Fire', originalTitle: 'Portrait de la jeune fille en feu', year: 2019, posterPath: '/2LquGwEhbg3soxSCs9VNyh5VJd9.jpg', language: 'French', theme: 'Art & Desire' },
 ];
 
@@ -142,7 +142,7 @@ export default function ContestPage() {
       <SparkleBackground />
       <NavBar userAvatar={user?.avatar} />
 
-      <div className="pt-20 relative z-10">
+      <div className="pt-24 relative z-10">
         {!selectedMovie ? (
           /* MOVIE SELECTION */
           <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-8">
