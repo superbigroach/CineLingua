@@ -138,10 +138,10 @@ export default function ContestPage() {
       <SparkleBackground />
       <NavBar userAvatar={user?.avatar} />
 
-      <div className="pt-14 relative z-10">
+      <div className="pt-20 relative z-10">
         {!selectedMovie ? (
           /* MOVIE SELECTION */
-          <div className="max-w-[1400px] mx-auto px-6 py-10">
+          <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-8">
             <div className="text-center mb-10">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/20 rounded-full text-emerald-400 text-sm font-medium mb-4">
                 <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -173,23 +173,80 @@ export default function ContestPage() {
           </div>
         ) : (
           /* CONTEST POOL VIEW */
-          <div className="max-w-[1400px] mx-auto px-6 py-6">
+          <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-6">
             <button onClick={() => setSelectedMovie(null)} className="flex items-center gap-2 text-white/50 hover:text-white text-sm mb-6">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-              Back
+              Back to Movies
             </button>
 
-            <div className="flex items-start gap-6 mb-8">
-              <img src={selectedMovie.poster} alt="" className="w-24 h-36 rounded-lg object-cover" />
-              <div>
+            <div className="flex flex-col sm:flex-row items-start gap-6 mb-6">
+              <img src={selectedMovie.poster} alt="" className="w-24 h-36 rounded-lg object-cover shadow-lg" />
+              <div className="flex-1">
                 <h1 className="text-2xl font-bold text-white">{selectedMovie.title}</h1>
-                <p className="text-white/50 text-sm mb-4">{selectedMovie.theme}</p>
-                <div className="flex gap-4">
+                <p className="text-white/50 text-sm mb-4">{selectedMovie.theme} • {selectedMovie.language}</p>
+                <div className="flex flex-wrap gap-3">
                   <div className="px-3 py-2 bg-emerald-500/20 rounded-lg"><p className="text-lg font-bold text-emerald-400">${selectedMovie.prizePool.toFixed(2)}</p><p className="text-white/40 text-xs">Pool</p></div>
                   <div className="px-3 py-2 bg-white/[0.04] rounded-lg"><p className="text-lg font-bold text-white">{submissions.length}</p><p className="text-white/40 text-xs">Entries</p></div>
                   <div className="px-3 py-2 bg-white/[0.04] rounded-lg"><p className="text-lg font-bold text-cyan-400">{timeRemaining}</p><p className="text-white/40 text-xs">Left</p></div>
                 </div>
               </div>
+            </div>
+
+            {/* Entry Flow Steps */}
+            <div className="bg-gradient-to-r from-purple-500/10 via-cyan-500/10 to-emerald-500/10 rounded-2xl border border-white/10 p-6 mb-6">
+              <h2 className="text-lg font-bold text-white mb-4 text-center">Enter This Contest</h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {/* Step 1: Take Quiz */}
+                <button
+                  onClick={() => router.push(`/?movie=${selectedMovie.id}`)}
+                  className="group p-4 bg-white/5 hover:bg-purple-500/20 rounded-xl border border-white/10 hover:border-purple-500/40 transition-all text-center"
+                >
+                  <div className="w-12 h-12 mx-auto rounded-full bg-purple-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                    <span className="text-2xl">1</span>
+                  </div>
+                  <h3 className="font-bold text-white text-sm mb-1">Take Quiz</h3>
+                  <p className="text-white/40 text-xs">Learn vocabulary</p>
+                </button>
+
+                {/* Step 2: Create Scene */}
+                <button
+                  onClick={() => router.push(`/?movie=${selectedMovie.id}&action=create`)}
+                  className="group p-4 bg-white/5 hover:bg-cyan-500/20 rounded-xl border border-white/10 hover:border-cyan-500/40 transition-all text-center"
+                >
+                  <div className="w-12 h-12 mx-auto rounded-full bg-cyan-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                    <span className="text-2xl">2</span>
+                  </div>
+                  <h3 className="font-bold text-white text-sm mb-1">Create Scene</h3>
+                  <p className="text-white/40 text-xs">Write your prompt</p>
+                </button>
+
+                {/* Step 3: Generate Video */}
+                <button
+                  onClick={() => router.push(`/?movie=${selectedMovie.id}&action=generate`)}
+                  className="group p-4 bg-white/5 hover:bg-orange-500/20 rounded-xl border border-white/10 hover:border-orange-500/40 transition-all text-center"
+                >
+                  <div className="w-12 h-12 mx-auto rounded-full bg-orange-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                    <span className="text-2xl">3</span>
+                  </div>
+                  <h3 className="font-bold text-white text-sm mb-1">Generate</h3>
+                  <p className="text-white/40 text-xs">3x 8-sec clips</p>
+                </button>
+
+                {/* Step 4: Submit & Pay */}
+                <button
+                  onClick={() => router.push('/wallet')}
+                  className="group p-4 bg-white/5 hover:bg-emerald-500/20 rounded-xl border border-white/10 hover:border-emerald-500/40 transition-all text-center"
+                >
+                  <div className="w-12 h-12 mx-auto rounded-full bg-emerald-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                    <span className="text-2xl">4</span>
+                  </div>
+                  <h3 className="font-bold text-white text-sm mb-1">Submit</h3>
+                  <p className="text-white/40 text-xs">$7.70 USDC</p>
+                </button>
+              </div>
+              <p className="text-center text-white/30 text-xs mt-4">
+                $2.40 generation + $4.80 stake + $0.50 platform fee • Top 3 split 80% of pool
+              </p>
             </div>
 
             <div className="grid lg:grid-cols-3 gap-6">
