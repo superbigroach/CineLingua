@@ -309,6 +309,9 @@ export default function Home() {
 
           {/* Nav Links */}
           <div className="hidden md:flex items-center gap-1 ml-6">
+            <a href="/studio" className="px-3 py-1.5 text-white/50 hover:text-white hover:bg-white/[0.04] rounded-lg text-sm transition-all">
+              Studio
+            </a>
             <a href="/contest" className="px-3 py-1.5 text-white/50 hover:text-white hover:bg-white/[0.04] rounded-lg text-sm transition-all">
               Contest
             </a>
